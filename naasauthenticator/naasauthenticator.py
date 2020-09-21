@@ -90,7 +90,7 @@ class NaasAuthenticator(Authenticator):
             return True
 
         time_last_attempt = datetime.now() - login_attempts['time']
-        if time_last_attempt.seconds > self.seconds_before_next_try:
+        if time_last_attempt.total_seconds() > self.seconds_before_next_try:
             return True
 
         return False
@@ -114,7 +114,7 @@ class NaasAuthenticator(Authenticator):
         username = self.normalize_username(data['username'])
         password = data['password']
 
-        user = self.get_user(username)
+        user = UserInfo.find(self.db, username)
         if not user:
             return
 
@@ -151,26 +151,17 @@ class NaasAuthenticator(Authenticator):
 
         return all(checks)
 
-    def get_user(self, username):
-        return UserInfo.find(self.db, self.normalize_username(username))
+    def create_user(self, username, password, **kwargs):
 
-    def user_exists(self, username):
-        return self.get_user(username) is not None
-
-    def create_user(self, username, pw, **kwargs):
-        username = self.normalize_username(username)
-
-        if self.user_exists(username):
-            return
-
-        if not self.is_password_strong(pw) or \
+        if not self.is_password_strong(password) or \
            not self.validate_username(username):
             return
-        if not self.enable_signup:
-            return
 
-        encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
-        infos = {'username': username, 'password': encoded_pw}
+        encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        infos = {'username': username, 'password': encoded_password}
+        if kwargs['admin'] and kwargs['admin'] == 'true' and self.admin_users:
+            self.admin_users.add(username)
+        kwargs.pop('admin', None)
         infos.update(kwargs)
 
         try:
@@ -184,8 +175,12 @@ class NaasAuthenticator(Authenticator):
             self.whitelist.add(username)
         return user_info
 
+    def get_user(self, username, password, **kwargs):
+        user = UserInfo.find(self.db, username)
+        return user
+
     def change_password(self, username, new_password):
-        user = self.get_user(username)
+        user = UserInfo.find(self.db, username)
         user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
         self.db.commit()
 
@@ -206,7 +201,7 @@ class NaasAuthenticator(Authenticator):
         return native_handlers
 
     def delete_user(self, user):
-        user_info = self.get_user(user.name)
+        user_info = UserInfo.find(self.db, user.name)
         if user_info is not None:
             self.db.delete(user_info)
             self.db.commit()
@@ -223,17 +218,3 @@ class NaasAuthenticator(Authenticator):
             os.remove(db_complete_path + '.db')
         else:
             os.remove(db_complete_path)
-
-    def add_data_from_firstuse(self):
-        with dbm.open(self.firstuse_db_path, 'c', 0o600) as db:
-            for user in db.keys():
-                password = db[user].decode()
-                new_user = self.create_user(user.decode(), password)
-                if not new_user:
-                    error = '''User {} was not created. Check password
-                               restrictions or username problems before trying
-                               again'''.format(user)
-                    raise ValueError(error)
-
-        if self.delete_firstuse_db_after_import:
-            self.delete_dbm_db()

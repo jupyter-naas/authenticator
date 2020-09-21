@@ -33,37 +33,23 @@ pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 ])
 async def test_create_user(is_admin, expected_authorization,
                            tmpcwd, app):
-    '''Test method create_user for new user and authorization '''
+    '''Test method get_or_create_user for new user and authorization '''
     auth = NaasAuthenticator(db=app.db)
 
     if is_admin:
         auth.admin_users = ({'johnsnow'})
 
-    auth.create_user('johnsnow', 'password')
+    auth.get_or_create_user('johnsnow', 'password')
     user_info = UserInfo.find(app.db, 'johnsnow')
     assert user_info.username == 'johnsnow'
     assert user_info.is_authorized == expected_authorization
 
 
-async def test_create_user_bad_characters(tmpcwd, app):
-    '''Test method create_user with bad characters on username'''
+async def test_create_user_bas_characters(tmpcwd, app):
+    '''Test method get_or_create_user with bad characters on username'''
     auth = NaasAuthenticator(db=app.db)
-    assert not auth.create_user('john snow', 'password')
-    assert not auth.create_user('john,snow', 'password')
-
-
-async def test_create_user_twice(tmpcwd, app):
-    '''Test if creating users with an existing handle errors.'''
-    auth = NaasAuthenticator(db=app.db)
-
-    # First creation should succeed.
-    assert auth.create_user('johnsnow', 'password')
-
-    # Creating the same account again should fail.
-    assert not auth.create_user('johnsnow', 'password')
-
-    # Creating a user with same handle but different pw should also fail.
-    assert not auth.create_user('johnsnow', 'adifferentpassword')
+    assert not auth.get_or_create_user('john snow', 'password')
+    assert not auth.get_or_create_user('john,snow', 'password')
 
 
 @pytest.mark.parametrize("password,min_len,expected", [
@@ -74,30 +60,12 @@ async def test_create_user_twice(tmpcwd, app):
 ])
 async def test_create_user_with_strong_passwords(password, min_len, expected,
                                                  tmpcwd, app):
-    '''Test if method create_user and strong passwords mesh'''
+    '''Test if method get_or_create_user and strong passwords'''
     auth = NaasAuthenticator(db=app.db)
     auth.check_common_password = True
     auth.minimum_password_length = min_len
-    user = auth.create_user('johnsnow', password)
+    user = auth.get_or_create_user('johnsnow', password)
     assert bool(user) == expected
-
-
-@pytest.mark.parametrize("enable_signup,expected_success", [
-    (True, True),
-    (False, False),
-])
-async def test_create_user_disable(enable_signup, expected_success,
-                                   tmpcwd, app):
-    '''Test method get_or_create_user not create user if signup is disabled'''
-    auth = NaasAuthenticator(db=app.db)
-    auth.enable_signup = enable_signup
-
-    user = auth.create_user('johnsnow', 'password')
-
-    if expected_success:
-        assert user.username == 'johnsnow'
-    else:
-        assert not user
 
 
 @pytest.mark.parametrize("username,password,authorized,expected", [
@@ -111,7 +79,7 @@ async def test_authentication(username, password, authorized, expected,
                               tmpcwd, app):
     '''Test if authentication fails with a unexistent user'''
     auth = NaasAuthenticator(db=app.db)
-    auth.create_user('johnsnow', 'password')
+    auth.get_or_create_user('johnsnow', 'password')
     if authorized:
         UserInfo.change_authorization(app.db, 'johnsnow')
     response = await auth.authenticate(app, {'username': username,
@@ -143,7 +111,7 @@ async def test_authentication_login_count(tmpcwd, app):
     auth = NaasAuthenticator(db=app.db)
     infos = {'username': 'johnsnow', 'password': 'password'}
     wrong_infos = {'username': 'johnsnow', 'password': 'wrong_password'}
-    auth.create_user(infos['username'], infos['password'])
+    auth.get_or_create_user(infos['username'], infos['password'])
     UserInfo.change_authorization(app.db, 'johnsnow')
 
     assert not auth.login_attempts
@@ -164,7 +132,7 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     auth.secs_before_next_try = 10
 
     infos = {'username': 'johnsnow', 'password': 'wrongpassword'}
-    auth.create_user(infos['username'], 'password')
+    auth.get_or_create_user(infos['username'], 'password')
     UserInfo.change_authorization(app.db, 'johnsnow')
 
     for i in range(3):
@@ -182,27 +150,16 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
 
 async def test_change_password(tmpcwd, app):
     auth = NaasAuthenticator(db=app.db)
-    user = auth.create_user('johnsnow', 'password')
+    user = auth.get_or_create_user('johnsnow', 'password')
     assert user.is_valid_password('password')
     auth.change_password('johnsnow', 'newpassword')
     assert not user.is_valid_password('password')
     assert user.is_valid_password('newpassword')
 
 
-async def test_get_user(tmpcwd, app):
-    auth = NaasAuthenticator(db=app.db)
-    auth.create_user('johnsnow', 'password')
-
-    # Getting existing user is successful.
-    assert auth.get_user('johnsnow') is not None
-
-    # Getting non-existing user fails.
-    assert auth.get_user('samwelltarly') is None
-
-
 async def test_delete_user(tmpcwd, app):
     auth = NaasAuthenticator(db=app.db)
-    auth.create_user('johnsnow', 'password')
+    auth.get_or_create_user('johnsnow', 'password')
 
     user = type('User', (), {'name': 'johnsnow'})
     auth.delete_user(user)

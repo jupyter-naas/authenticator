@@ -34,23 +34,18 @@ class SignUpHandler(LocalBase):
     async def get(self):
         self.redirect('/')
 
-    def get_result_message(self, user, username):
+    def get_result_message(self, user):
         alert = 'alert-success'
         message = ('The signup was successful. You can now go to '
                    'home page and log in the system')
         if not user:
             alert = 'alert-danger'
             password_len = self.authenticator.minimum_password_length
-            taken = self.authenticator.user_exists(username)
+
             if password_len:
                 message = ("Something went wrong. Be sure your password has "
                            "at least {} characters, doesn't have spaces or "
                            "commas and is not too common.").format(password_len)
-
-            elif taken:
-                message = ("Something went wrong. It appears that this "
-                           "username is already in use. Please try again "
-                           "with a different username.")
 
             else:
                 message = ("Something went wrong. Be sure your password "
@@ -61,7 +56,6 @@ class SignUpHandler(LocalBase):
 
     async def post(self):
         api_token = self.request.headers.get('Authorization', None)
-
         user_info = {
             'username': self.get_body_argument('username', strip=False),
             'password': self.get_body_argument('password', strip=False),
@@ -77,8 +71,7 @@ class SignUpHandler(LocalBase):
                        ' Ask an Cashstory Admin to get access')
         elif api_token and api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
             user = self.authenticator.create_user(**user_info)
-            name = self.authenticator.user_exists(user_info['username'])
-            alert, message = self.get_result_message(user, name)
+            alert, message = self.get_result_message(user)
         else:
             alert = 'alert-danger'
             message = ('Signup not allowed.'
