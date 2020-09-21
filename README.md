@@ -1,14 +1,6 @@
-# Native Authenticator
+# Naas Authenticator
 
-
-[![Circle Ci Badge](https://img.shields.io/circleci/project/github/jupyterhub/naasauthenticator.svg)](https://circleci.com/gh/jupyterhub/naasauthenticator)
-
-![Code Cov](https://img.shields.io/codecov/c/github/jupyterhub/naasauthenticator.svg)
-
-
-A simple authenticator for small-medium size [JupyterHub](http://github.com/jupyter/jupyterhub/) applications.
-
-Native Authenticator provides the following features:
+Naas Authenticator provides the following features:
 
 * New users can signup on the system;
 * New users can be blocked of accessing the system and need an admin authorization;
@@ -21,7 +13,7 @@ Native Authenticator provides the following features:
 
 ## Documentation
 
-Documentation is available [here](https://native-authenticator.readthedocs.io)
+Documentation is available [here](https://naas-authenticator.readthedocs.io)
 
 
 ## Running tests
