@@ -9,8 +9,14 @@ from sqlalchemy import inspect
 from tornado import gen
 from traitlets import Bool, Integer, Unicode
 
-from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler, DeleteHandler,
-                       ChangePasswordHandler, LoginHandler, SignUpHandler)
+from .handlers import (
+    AuthorizationHandler,
+    ChangeAuthorizationHandler,
+    DeleteHandler,
+    ChangePasswordHandler,
+    LoginHandler,
+    SignUpHandler,
+)
 from .orm import UserInfo
 
 
@@ -20,48 +26,41 @@ class NaasAuthenticator(Authenticator):
     check_common_password = Bool(
         config=True,
         default=False,
-        help=("Creates a verification of password strength "
-              "when a new user makes signup")
+        help=("Creates a verification of password strength " "when a new user makes signup"),
     )
     minimum_password_length = Integer(
         config=True,
         default=1,
-        help=("Check if the length of the password is at least this size on "
-              "signup")
+        help=("Check if the length of the password is at least this size on " "signup"),
     )
     allowed_failed_logins = Integer(
         config=True,
         default=0,
-        help=("Configures the number of failed attempts a user can have "
-              "before being blocked.")
+        help=("Configures the number of failed attempts a user can have " "before being blocked."),
     )
     seconds_before_next_try = Integer(
         config=True,
         default=600,
-        help=("Configures the number of seconds a user has to wait "
-              "after being blocked. Default is 600.")
+        help=(
+            "Configures the number of seconds a user has to wait "
+            "after being blocked. Default is 600."
+        ),
     )
-    ask_email_on_signup = Bool(
-        False,
-        config=True,
-        help="Asks for email on signup"
-    )
+    ask_email_on_signup = Bool(False, config=True, help="Asks for email on signup")
     import_from_firstuse = Bool(
-        False,
-        config=True,
-        help="Import users from FirstUse Authenticator database"
+        False, config=True, help="Import users from FirstUse Authenticator database"
     )
     firstuse_db_path = Unicode(
-        'passwords.dbm',
+        "passwords.dbm",
         config=True,
         help="""
         Path to store the db file of FirstUse with username / password hash in
-        """
+        """,
     )
     delete_firstuse_db_after_import = Bool(
         config=True,
         default_value=False,
-        help="Deletes FirstUse Authenticator database after the import"
+        help="Deletes FirstUse Authenticator database after the import",
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -73,23 +72,22 @@ class NaasAuthenticator(Authenticator):
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
-        if 'users_info' not in inspector.get_table_names():
+        if "users_info" not in inspector.get_table_names():
             UserInfo.__table__.create(self.db.bind)
 
     def add_login_attempt(self, username):
         if not self.login_attempts.get(username):
-            self.login_attempts[username] = {'count': 1,
-                                             'time': datetime.now()}
+            self.login_attempts[username] = {"count": 1, "time": datetime.now()}
         else:
-            self.login_attempts[username]['count'] += 1
-            self.login_attempts[username]['time'] = datetime.now()
+            self.login_attempts[username]["count"] += 1
+            self.login_attempts[username]["time"] = datetime.now()
 
     def can_try_to_login_again(self, username):
         login_attempts = self.login_attempts.get(username)
         if not login_attempts:
             return True
 
-        time_last_attempt = datetime.now() - login_attempts['time']
+        time_last_attempt = datetime.now() - login_attempts["time"]
         if time_last_attempt.total_seconds() > self.seconds_before_next_try:
             return True
 
@@ -98,7 +96,7 @@ class NaasAuthenticator(Authenticator):
     def is_blocked(self, username):
         logins = self.login_attempts.get(username)
 
-        if not logins or logins['count'] < self.allowed_failed_logins:
+        if not logins or logins["count"] < self.allowed_failed_logins:
             return False
 
         if self.can_try_to_login_again(username):
@@ -111,8 +109,8 @@ class NaasAuthenticator(Authenticator):
 
     @gen.coroutine
     def authenticate(self, handler, data):
-        username = self.normalize_username(data['username'])
-        password = data['password']
+        username = self.normalize_username(data["username"])
+        password = data["password"]
 
         user = UserInfo.find(self.db, username)
         if not user:
@@ -122,10 +120,7 @@ class NaasAuthenticator(Authenticator):
             if self.is_blocked(username):
                 return
 
-        validations = [
-            user.is_authorized,
-            user.is_valid_password(password)
-        ]
+        validations = [user.is_authorized, user.is_valid_password(password)]
 
         if all(validations):
             self.successful_login(username)
@@ -135,8 +130,7 @@ class NaasAuthenticator(Authenticator):
 
     def is_password_common(self, password):
         common_credentials_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'common-credentials.txt'
+            os.path.dirname(os.path.abspath(__file__)), "common-credentials.txt"
         )
         if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
@@ -153,15 +147,14 @@ class NaasAuthenticator(Authenticator):
 
     def create_user(self, username, password, **kwargs):
 
-        if not self.is_password_strong(password) or \
-           not self.validate_username(username):
+        if not self.is_password_strong(password) or not self.validate_username(username):
             return
 
         encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-        infos = {'username': username, 'password': encoded_password}
-        if kwargs['admin'] and kwargs['admin'] == 'true' and self.admin_users:
+        infos = {"username": username, "password": encoded_password}
+        if kwargs["admin"] and kwargs["admin"] == "true" and self.admin_users:
             self.admin_users.add(username)
-        kwargs.pop('admin', None)
+        kwargs.pop("admin", None)
         infos.update(kwargs)
 
         try:
@@ -185,18 +178,19 @@ class NaasAuthenticator(Authenticator):
         self.db.commit()
 
     def validate_username(self, username):
-        invalid_chars = [',', ' ']
+        invalid_chars = [",", " "]
         if any((char in username) for char in invalid_chars):
             return False
         return super().validate_username(username)
 
     def get_handlers(self, app):
         native_handlers = [
-            (r'/signup', SignUpHandler),
-            (r'/authorize', AuthorizationHandler),
-            (r'/delete/([^/]*)', DeleteHandler),
-            (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
-            (r'/change-password', ChangePasswordHandler),
+            (r"/signup", SignUpHandler),
+            (r"/login", LoginHandler),
+            (r"/authorize", AuthorizationHandler),
+            (r"/delete/([^/]*)", DeleteHandler),
+            (r"/authorize/([^/]*)", ChangeAuthorizationHandler),
+            (r"/change-password", ChangePasswordHandler),
         ]
         return native_handlers
 
@@ -214,7 +208,7 @@ class NaasAuthenticator(Authenticator):
         db_complete_path = str(db_path.absolute())
 
         # necessary for BSD implementation of dbm lib
-        if os.path.exists(os.path.join(db_dir, db_name + '.db')):
-            os.remove(db_complete_path + '.db')
+        if os.path.exists(os.path.join(db_dir, db_name + ".db")):
+            os.remove(db_complete_path + ".db")
         else:
             os.remove(db_complete_path)
