@@ -154,6 +154,8 @@ class ChangePasswordHandler(LocalBase):
 class LoginHandler(LoginHandler, LocalBase):
     def _render(self, login_error=None, username=None):
         self._register_template_path()
+        landing_url = os.getenv("LANDING_URL")
+        crisp_website_id = os.getenv("CRISP_WEBSITE_ID")
         return self.render_template(
             "native-login.html",
             next=url_escape(self.get_argument("next", default="")),
@@ -161,6 +163,8 @@ class LoginHandler(LoginHandler, LocalBase):
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
             login_url=self.settings["login_url"],
+            landing_url=landing_url,
+            crisp_website_id=crisp_website_id,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
                 {"next": self.get_argument("next", "")},
