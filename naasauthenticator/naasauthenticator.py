@@ -57,14 +57,11 @@ class NaasAuthenticator(Authenticator):
         Path to store the db file of FirstUse with username / password hash in
         """,
     )
+
     delete_firstuse_db_after_import = Bool(
         config=True,
         default_value=False,
         help="Deletes FirstUse Authenticator database after the import",
-    )
-    admin_email = Unicode(config=True, default_value="", help="Contact email for admin(s)")
-    signup_subject = Unicode(
-        config=True, default_value="Need Access to NAAS", help="Contact email for admin(s)"
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):

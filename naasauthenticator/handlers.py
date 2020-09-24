@@ -165,6 +165,4 @@ class LoginHandler(LoginHandler, LocalBase):
                 self.authenticator.login_url(self.hub.base_url),
                 {"next": self.get_argument("next", "")},
             ),
-            admin_email=self.authenticator.admin_email,
-            signup_subject=self.authenticator.signup_subject,
         )
