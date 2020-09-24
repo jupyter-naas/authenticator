@@ -62,6 +62,10 @@ class NaasAuthenticator(Authenticator):
         default_value=False,
         help="Deletes FirstUse Authenticator database after the import",
     )
+    admin_email = Unicode(config=True, default_value="", help="Contact email for admin(s)")
+    signup_subject = Unicode(
+        config=True, default_value="Need Access to NAAS", help="Contact email for admin(s)"
+    )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
