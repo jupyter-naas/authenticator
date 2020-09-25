@@ -19,15 +19,15 @@ body {
 .warning {
     background-color: #24272A !important;
 }
-.auth-form-header {
-    background-color: #2AA6FF !important;
-    border-color: #2AA6FF !important;
+.auth-form-body {
+    border-top: thin silver solid !important;
 }
 .naas-logo {
     width: 100% !important;
     height: 15rem;
 }
 </style>
+
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
         let button = document.getElementById('eye');
@@ -43,18 +43,17 @@ body {
         });
     });
 </script>
+
 {% block nav_bar %}
 {% endblock %}
+
 {% block login %}
 <div id="login-main" class="container">
     <form action="{{login_url}}?next={{next}}" method="post" role="form">
-        <div style="padding-bottom:2em">
+        <div>
             <a href="{{logo_url or base_url}}">
                 <img src='{{base_url}}logo' alt='Naas' class='naas-logo' title='Home'/>
             </a>
-        </div>
-        <div class="auth-form-header">
-            Sign In
         </div>
         <div class='auth-form-body'>
             <p id='insecure-login-warning' class='hidden warning'>
@@ -71,6 +70,11 @@ body {
                 name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
             <p></p>
             <label for='password_input'>Password:</label>
+            {% if crisp_website_id %}
+            <a style="float: right" id="forget-password" onclick="forgotPassword()" href="#">
+                <small>Forgot Password?</small>
+            </a>
+            {% endif %}
             <span class="input-group">
                 <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
                 <span class="input-group-addon">
@@ -79,7 +83,14 @@ body {
                     </button>
                 </span>
             </span>
-            <input type="submit" id="login_submit" class='btn' value='Sign In' tabindex="3" />
+            <input type="submit" id="login_submit" class='btn' value='Login' tabindex="3" />
+            {% if landing_url %}
+            <div style="padding-top: 25px">
+                <p style="text-align: center;">
+                    No account? <a href="{{ landing_url }}" target="_blank">Create one</a>
+                </p>
+            </div>
+            {% endif %}
         </div>
     </form>
 </div>
@@ -87,11 +98,17 @@ body {
 {% endblock %}
 {% block script %}
 {{ super() }}
+{% if crisp_website_id %}
+    <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="{{ crisp_website_id }}";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+{% endif %}
 <script>
     if (window.location.protocol === "http:") {
         // unhide http warning
         let warning = document.getElementById('insecure-login-warning');
         warning.className = warning.className.replace(/\bhidden\b/, '');
     }
+    function forgotPassword (ev) {
+        $crisp.do("chat:open");
+    };
 </script>
 {% endblock %}

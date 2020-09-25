@@ -57,6 +57,7 @@ class NaasAuthenticator(Authenticator):
         Path to store the db file of FirstUse with username / password hash in
         """,
     )
+
     delete_firstuse_db_after_import = Bool(
         config=True,
         default_value=False,
