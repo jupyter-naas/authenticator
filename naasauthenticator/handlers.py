@@ -33,8 +33,23 @@ class SignUpHandler(LocalBase):
     """Render the sign in page."""
 
     async def get(self):
-        self.redirect("/")
-
+        api_token = self.request.headers.get("Authorization", None)
+        if api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
+            response = {
+                "error": True,
+                "message": "Ask an Cashstory Admin to do it",
+            }
+            self.finish(response)
+            return response
+        else:
+            users = self.authenticator.get_users(**user_info)
+            response = {
+                "users": users,
+                "message": "Here the list of users",
+            }
+            self.finish(response)
+            return response
+            
     def get_result_message(self, user):
         alert = "alert-success"
         message = "The signup was successful. You can now go to " "home page and log in the system"
@@ -57,7 +72,25 @@ class SignUpHandler(LocalBase):
                 )
 
         return alert, message
-
+      
+    async def delete(self):
+        api_token = self.request.headers.get("Authorization", None)
+        if api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
+            response = {
+                "error": True,
+                "message": "Ask an Cashstory Admin to do it",
+            }
+            self.finish(response)
+            return response
+        else:
+            user = self.authenticator.delete_user(self.get_body_argument("username", strip=False))
+            response = {
+                "users": user,
+                "message": "User deleted",
+            }
+            self.finish(response)
+            return response          
+        
     async def post(self):
         api_token = self.request.headers.get("Authorization", None)
         user_info = {
