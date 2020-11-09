@@ -172,7 +172,15 @@ class NaasAuthenticator(Authenticator):
     def get_user(self, username, password, **kwargs):
         user = UserInfo.find(self.db, username)
         return user
-
+    
+    def delete_user(self, username, **kwargs):
+        user = UserInfo.delete_user(self.db, username)
+        return user
+    
+    def get_users(self):
+        user = UserInfo.get_all(self.db)
+        return user
+    
     def change_password(self, username, new_password):
         user = UserInfo.find(self.db, username)
         user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
