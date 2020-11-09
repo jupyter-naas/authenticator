@@ -47,7 +47,7 @@ class UserInfo(Base):
         return user
 
     @classmethod
-    def get_all(cls, db, username):
+    def get_all(cls, db):
         return db.query(cls)
 
     @validates('email')
