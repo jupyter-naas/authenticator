@@ -46,6 +46,10 @@ class UserInfo(Base):
         db.commit()
         return user
 
+    @classmethod
+    def get_all(cls, db, username):
+        return db.query(cls)
+
     @validates('email')
     def validate_email(self, key, address):
         if not address:
