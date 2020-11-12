@@ -78,7 +78,7 @@ a {
             <p></p>
             <label for='password_input'>Password:</label>
             {% if crisp_website_id %}
-            <a style="float: right" id="forget-password" onclick="forgotPassword()" href="#">
+            <a style="float: right" id="forget-password" href="{{base_url}}reset-password">
                 <small>Forgot Password?</small>
             </a>
             {% endif %}
@@ -114,7 +114,7 @@ a {
         let warning = document.getElementById('insecure-login-warning');
         warning.className = warning.className.replace(/\bhidden\b/, '');
     }
-    function forgotPassword (ev) {
+    function openCrips (ev) {
         $crisp.do("chat:open");
     };
 </script>
