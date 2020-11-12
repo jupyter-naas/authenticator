@@ -7,6 +7,8 @@ from jupyterhub.utils import admin_only
 from tornado import web
 from tornado.escape import url_escape
 from tornado.httputil import url_concat
+import secrets
+import requests
 
 from .orm import UserInfo
 
@@ -143,7 +145,56 @@ class ChangeAuthorizationHandler(LocalBase):
         UserInfo.change_authorization(self.db, slug)
         self.redirect(self.hub.base_url + "authorize")
 
+class ResetPasswordHandler(LocalBase):
+    
+    async def get(self):
+        user = await self.get_current_user()
+        html = self.render_template(
+            'reset-password.html',
+        )
+        self.finish(html)
 
+    @web.authenticated
+    async def post(self):
+        username = self.get_body_argument("username", strip=False)
+        user = self.authenticator.get_user(username)
+        message = ""
+        alert = "alert-success"
+        new_password = secrets.token_hex(16)
+        message = "Your password has been changed successfully"
+        self.authenticator.change_password(user.name, new_password)
+        signup_url = f"{os.environ.get("NOTIFICATIONS_API", None)}/send"
+        html = """
+        You asked to reset your password,
+           Copy this temporary password :
+            {TEMP_PASSWORD}
+           <br/>Connect to this page and change it :
+           <a href="{RESET_URL}">Change my password</a>
+           <br/> or contact us in the chat box if you never asked to reset.
+        """
+        html = html.replace("{TEMP_PASSWORD}", new_password)
+        html = html.replace("{RESET_URL}", f"{self.hub.base_url}/login?next=change-password")
+        content = html
+        data = {
+            "subject": "Naas Reset password",
+            "email": username,
+            "content": content,
+            "html": html,
+        }
+        headers = {"Authorization": os.environ.get("NOTIFICATIONS_ADMIN_TOKEN", None)}
+        r = requests.put(signup_url, data=login, headers=headers)
+        r.raise_for_status()
+
+        response = {
+            "name": username,
+            "message": message,
+        }
+        if alert == "alert-danger":
+            response["error"] = True
+
+        self.finish(response)
+        return response
+    
 class DeleteHandler(LocalBase):
     @admin_only
     async def get(self, slug):
