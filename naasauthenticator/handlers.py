@@ -74,7 +74,7 @@ class SignUpHandler(LocalBase):
                 )
 
         return alert, message
-      
+
     async def delete(self):
         api_token = self.request.headers.get("Authorization", None)
         if api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
@@ -163,14 +163,14 @@ class ResetPasswordHandler(LocalBase):
         new_password = secrets.token_hex(16)
         message = "Your password has been changed successfully"
         self.authenticator.change_password(user.name, new_password)
-        signup_url = f"{os.environ.get("NOTIFICATIONS_API", None)}/send"
+        signup_url = f"{os.environ.get('NOTIFICATIONS_API', None)}/send"
         html = """
         You asked to reset your password,
-           Copy this temporary password :
-            {TEMP_PASSWORD}
-           <br/>Connect to this page and change it :
-           <a href="{RESET_URL}">Change my password</a>
-           <br/> or contact us in the chat box if you never asked to reset.
+        <br/>Copy this temporary password :
+        <br/>{TEMP_PASSWORD}
+        <br/>Connect to this page and change it :
+        <a href="{RESET_URL}">Change my password</a>
+        <br/> or contact us in the chat box if you never asked to reset.
         """
         html = html.replace("{TEMP_PASSWORD}", new_password)
         html = html.replace("{RESET_URL}", f"{self.hub.base_url}/login?next=change-password")
@@ -182,7 +182,7 @@ class ResetPasswordHandler(LocalBase):
             "html": html,
         }
         headers = {"Authorization": os.environ.get("NOTIFICATIONS_ADMIN_TOKEN", None)}
-        r = requests.put(signup_url, data=login, headers=headers)
+        r = requests.put(signup_url, data=data, headers=headers)
         r.raise_for_status()
 
         response = {
