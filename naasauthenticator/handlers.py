@@ -154,7 +154,6 @@ class ResetPasswordHandler(LocalBase):
         )
         self.finish(html)
 
-    @web.authenticated
     async def post(self):
         username = self.get_body_argument("username", strip=False)
         user = self.authenticator.get_user(username)
