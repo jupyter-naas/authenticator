@@ -165,6 +165,19 @@ class ChangePasswordHandler(LocalBase):
 
     @web.authenticated
     async def post(self):
+        user = await self.get_current_user()
+        new_password = self.get_body_argument('password', strip=False)
+        self.authenticator.change_password(user.name, new_password)
+
+        html = self.render_template(
+            'change-password.html',
+            user_name=user.name,
+            result_message='Your password has been changed successfully',
+        )
+        self.finish(html)
+        
+    @web.authenticated
+    async def put(self):
         api_token = self.request.headers.get("Authorization", None)
         username = self.get_body_argument("username", strip=False)
         user = self.authenticator.get_user(username)
