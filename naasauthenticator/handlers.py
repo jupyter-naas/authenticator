@@ -183,7 +183,7 @@ class ResetPasswordHandler(LocalBase):
         }
         headers = {"Authorization": os.environ.get("NOTIFICATIONS_ADMIN_TOKEN", None)}
         try:
-            r = requests.post(signup_url, data=data, headers=headers)
+            r = requests.post(signup_url, json=data, headers=headers)
             r.raise_for_status()
         except requests.HTTPError as err:
             err_code = err.response.status_code
