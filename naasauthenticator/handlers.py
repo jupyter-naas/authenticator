@@ -157,7 +157,7 @@ class ResetPasswordHandler(LocalBase):
     async def post(self):
         username = self.get_body_argument("username", strip=False)
         user = self.authenticator.get_user(username, None)
-        message = ""
+        message = "Check your emails"
         alert = "alert-success"
         new_password = secrets.token_hex(16)
         message = "Your password has been changed successfully"
@@ -181,9 +181,12 @@ class ResetPasswordHandler(LocalBase):
             "html": html,
         }
         headers = {"Authorization": os.environ.get("NOTIFICATIONS_ADMIN_TOKEN", None)}
-        r = requests.put(signup_url, data=data, headers=headers)
-        r.raise_for_status()
-
+        try:
+            r = requests.put(signup_url, data=data, headers=headers)
+            r.raise_for_status()
+        except:
+            alert = "alert-danger"
+            message = "Something wrong happen"
         response = {
             "name": username,
             "message": message,
