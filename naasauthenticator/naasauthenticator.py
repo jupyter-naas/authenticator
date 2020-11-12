@@ -13,6 +13,7 @@ from .handlers import (
     AuthorizationHandler,
     ChangeAuthorizationHandler,
     DeleteHandler,
+    ResetPasswordHandler,
     ChangePasswordHandler,
     LoginHandler,
     SignUpHandler,
@@ -199,6 +200,7 @@ class NaasAuthenticator(Authenticator):
             (r"/authorize", AuthorizationHandler),
             (r"/delete/([^/]*)", DeleteHandler),
             (r"/authorize/([^/]*)", ChangeAuthorizationHandler),
+            (r"/reset-password", ResetPasswordHandler),
             (r"/change-password", ChangePasswordHandler),
         ]
         return native_handlers
