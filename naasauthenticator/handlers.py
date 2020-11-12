@@ -171,9 +171,9 @@ class ResetPasswordHandler(LocalBase):
         <a href="{RESET_URL}">Change my password</a>
         <br/><br/>If you never asked to reset, contact us in the chat box on our <a href="{WEBSITE_URL}">website</a>.
         """
-        html = html.replace("{WEBSITE_URL}", self.hub.base_url)
         html = html.replace("{TEMP_PASSWORD}", new_password)
-        html = html.replace("{RESET_URL}", f"{self.hub.base_url}/login?next=change-password")
+        html = html.replace("{RESET_URL}", f"{os.environ.get("JUPYTERHUB_URL", "")}login?next=%2Fhub%2Fchange-password")
+        html = html.replace("{WEBSITE_URL}", os.environ.get("JUPYTERHUB_URL", ""))
         content = html
         data = {
             "subject": "Naas Reset password",
