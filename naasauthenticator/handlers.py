@@ -184,9 +184,10 @@ class ResetPasswordHandler(LocalBase):
         try:
             r = requests.put(signup_url, data=data, headers=headers)
             r.raise_for_status()
-        except:
+        except requests.HTTPError as err:
+            err_code = err.response.status_code
             alert = "alert-danger"
-            message = "Something wrong happen"
+            message = f"Something wrong happen {err.response.status_code} {err.response.body}"
         response = {
             "name": username,
             "message": message,
