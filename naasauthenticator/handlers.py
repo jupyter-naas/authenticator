@@ -161,7 +161,7 @@ class ResetPasswordHandler(LocalBase):
         alert = "alert-success"
         new_password = secrets.token_hex(16)
         message = "Your password has been changed successfully"
-        self.authenticator.change_password(user.name, new_password)
+        self.authenticator.change_password(username, new_password)
         signup_url = f"{os.environ.get('NOTIFICATIONS_API', None)}/send"
         html = """
         You asked to reset your password,
