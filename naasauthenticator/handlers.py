@@ -156,7 +156,12 @@ class ChangePasswordHandler(LocalBase):
 
     @web.authenticated
     async def get(self):
-        self.redirect("/")
+        user = await self.get_current_user()
+        html = self.render_template(
+            'change-password.html',
+            user_name=user.name,
+        )
+        self.finish(html)
 
     @web.authenticated
     async def post(self):
