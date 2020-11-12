@@ -188,7 +188,7 @@ class ResetPasswordHandler(LocalBase):
         except requests.HTTPError as err:
             err_code = err.response.status_code
             alert = "alert-danger"
-            message = f"Something wrong happen {err.response.status_code} {err.response.body}"
+            message = f"Something wrong happen"
         response = {
             "name": username,
             "message": message,
