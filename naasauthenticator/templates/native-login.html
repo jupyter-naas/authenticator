@@ -15,9 +15,13 @@ body {
 a {
     color: rgba(71, 221, 130, 1);
 }
-.btn {
+.btn-primary {
     background-color: rgba(71, 221, 130, 1);
     border-color: rgba(71, 221, 130, 1);
+}
+.btn-primary.active.focus, .btn-primary.active:focus, .btn-primary.active:hover, .btn-primary:active.focus, .btn-primary:active:focus, .btn-primary:active:hover {
+    background-color: #38B068;
+    border-color: #38B068;
 }
 .warning {
     background-color: #24272A !important;
@@ -86,7 +90,7 @@ a {
                     </button>
                 </span>
             </span>
-            <input type="submit" id="login_submit" class='btn' value='Login' tabindex="3" />
+            <input type="submit" id="login_submit" class="btn btn-lg btn-primary" value="Login" tabindex="3" />
             {% if landing_url %}
             <div style="padding-top: 25px">
                 <p style="text-align: center;">
