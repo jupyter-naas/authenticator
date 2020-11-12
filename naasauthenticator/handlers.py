@@ -193,9 +193,12 @@ class ResetPasswordHandler(LocalBase):
         }
         if alert == "alert-danger":
             response["error"] = True
-
-        self.finish(response)
-        return response
+        html = self.render_template(
+            'reset-password.html',
+            result_message=message,
+            alert=alert,
+        )
+        self.finish(html)
     
 class DeleteHandler(LocalBase):
     @admin_only
