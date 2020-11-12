@@ -156,7 +156,7 @@ class ResetPasswordHandler(LocalBase):
 
     async def post(self):
         username = self.get_body_argument("username", strip=False)
-        user = self.authenticator.get_user(username)
+        user = self.authenticator.get_user(username, None)
         message = ""
         alert = "alert-success"
         new_password = secrets.token_hex(16)
@@ -230,7 +230,7 @@ class ChangePasswordHandler(LocalBase):
     async def put(self):
         api_token = self.request.headers.get("Authorization", None)
         username = self.get_body_argument("username", strip=False)
-        user = self.authenticator.get_user(username)
+        user = self.authenticator.get_user(username, None)
         message = ""
         alert = "alert-success"
         if api_token and api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
