@@ -130,20 +130,29 @@ class AuthorizationHandler(LocalBase):
 
     @admin_only
     async def get(self):
-        self._register_template_path()
-        html = self.render_template(
-            "autorization-area.html",
-            ask_email=self.authenticator.ask_email_on_signup,
-            users=self.db.query(UserInfo).all(),
-        )
-        self.finish(html)
+        mimetype = self.request.headers.get("Content-Type", None)
+        if mimetype == 'text/html':
+            self._register_template_path()
+            html = self.render_template(
+                "autorization-area.html",
+                ask_email=self.authenticator.ask_email_on_signup,
+                users=self.db.query(UserInfo).all(),
+            )
+            self.finish(html)
+        else:
+            self.finish(self.db.query(UserInfo).all())
 
 
 class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def get(self, slug):
+        mimetype = self.request.headers.get("Content-Type", None)
         UserInfo.change_authorization(self.db, slug)
-        self.redirect(self.hub.base_url + "authorize")
+        if mimetype == 'text/html':
+            self.redirect(self.hub.base_url + "authorize")
+        else:
+            self.finish({"message": f"done for {slug}"})
+
 
 class ResetPasswordHandler(LocalBase):
     
