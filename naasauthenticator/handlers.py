@@ -145,13 +145,19 @@ class AuthorizationHandler(LocalBase):
 
 class ChangeAuthorizationHandler(LocalBase):
     @admin_only
-    async def get(self, slug):
+    async def put(self, slug):
         mimetype = self.request.headers.get("Content-Type", None)
         UserInfo.change_authorization(self.db, slug)
         if mimetype == 'text/html':
             self.redirect(self.hub.base_url + "authorize")
         else:
             self.finish({"message": f"done for {slug}"})
+            
+    @admin_only
+    async def get(self, slug):
+        mimetype = self.request.headers.get("Content-Type", None)
+        data = UserInfo.get_authorization(self.db, slug)
+        self.finish({"user": slug, "authorize", data})
 
 
 class ResetPasswordHandler(LocalBase):
