@@ -38,6 +38,13 @@ class UserInfo(Base):
         user.is_authorized = not user.is_authorized
         db.commit()
         return user
+
+    @classmethod
+    def update_authorization(cls, db, username, is_authorized):
+        user = db.query(cls).filter(cls.username == username).first()
+        user.is_authorized = is_authorized
+        db.commit()
+        return user
     
     @classmethod
     def get_authorization(cls, db, username):
