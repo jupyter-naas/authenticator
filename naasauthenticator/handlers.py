@@ -147,8 +147,9 @@ class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def put(self, slug):
         mimetype = self.request.headers.get("Content-Type", None)
-        UserInfo.change_authorization(self.db, slug)
-        self.finish({"message": f"done for {slug}"})
+        is_authorized = self.get_body_argument("username", strip=False)
+        user = UserInfo.update_authorization(self.db, slug, is_authorized)
+        self.finish({"user": data})
             
     @admin_only
     async def get(self, slug):
