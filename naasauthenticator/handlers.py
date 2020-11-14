@@ -124,7 +124,8 @@ class AuthorizationHandler(LocalBase):
     @admin_only
     async def get(self):
         mimetype = self.request.headers.get("content-type", None)
-        res = self.db.query(UserInfo).all()
+        print(mimetype)
+        res = UserInfo.get_all(self.db)
         if mimetype == 'application/json':
             users = to_json(res)
             self.finish({"users": users})
