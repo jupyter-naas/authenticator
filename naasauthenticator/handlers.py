@@ -110,7 +110,7 @@ class AuthorizationHandler(LocalBase):
 
     @admin_only
     async def get(self):
-        mimetype = self.request.headers.get("Content-Type", None)
+        mimetype = self.request.headers.get("content-type", None)
         if mimetype == 'text/html':
             self._register_template_path()
             html = self.render_template(
@@ -120,20 +120,19 @@ class AuthorizationHandler(LocalBase):
             )
             self.finish(html)
         else:
-            self.finish(self.db.query(UserInfo).all())
+            self.finish({"users": self.db.query(UserInfo).all()})
 
 
 class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def put(self, slug):
-        mimetype = self.request.headers.get("Content-Type", None)
         is_authorized = self.get_body_argument("username", strip=False)
         user = UserInfo.update_authorization(self.db, slug, is_authorized)
         self.finish({"user": user})
             
     @admin_only
     async def get(self, slug):
-        mimetype = self.request.headers.get("Content-Type", None)
+        mimetype = self.request.headers.get("content-type", None)
         if mimetype == 'text/html':
             UserInfo.change_authorization(self.db, slug)
             self.redirect(self.hub.base_url + "authorize")
