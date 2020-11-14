@@ -17,8 +17,8 @@ TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
 def to_json(res):
     res_list = []
-    for obj in res:
-        res_list.append(obj.toDict()) 
+    for row in res:
+        res_list.append(dict(row.__dict__)) 
     return res_list
 
 class LocalBase(BaseHandler):
