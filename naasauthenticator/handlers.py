@@ -37,7 +37,7 @@ class SignUpHandler(LocalBase):
         res = self.authenticator.get_users()
         users = [item.to_dict() for item in res]
         response = {
-            "users": users,
+            "data": users,
             "message": "Here the list of users",
         }
         self.finish(response)
@@ -70,7 +70,7 @@ class SignUpHandler(LocalBase):
     async def delete(self):
         user = self.authenticator.delete_user(self.get_body_argument("username", strip=False))
         response = {
-            "user": user,
+            "data": user,
             "message": "User deleted",
         }
         self.finish(response)
@@ -114,7 +114,7 @@ class AuthorizationHandler(LocalBase):
         res = UserInfo.get_all(self.db)
         if mimetype == 'application/json':
             users = [item.to_dict() for item in res]
-            self.finish({"users": users})
+            self.finish({"data": users})
         else:
             self._register_template_path()
             html = self.render_template(
@@ -131,14 +131,14 @@ class ChangeAuthorizationHandler(LocalBase):
     async def put(self, slug):
         is_authorized = self.get_body_argument("username", strip=False)
         user = UserInfo.update_authorization(self.db, slug, is_authorized)
-        self.finish({"user": user})
+        self.finish({"data": user})
             
     @admin_only
     async def get(self, slug):
         mimetype = self.request.headers.get("content-type", None)
         if mimetype == 'application/json':
             data = UserInfo.get_authorization(self.db, slug)
-            self.finish({"user": slug, "is_authorized": data})
+            self.finish({"data": {"username": slug, "is_authorized": data}})
         else:
             UserInfo.change_authorization(self.db, slug)
             self.redirect(self.hub.base_url + "authorize")
