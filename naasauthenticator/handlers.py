@@ -1,16 +1,17 @@
-import os
 from jinja2 import ChoiceLoader, FileSystemLoader
-from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
-from jupyterhub.utils import admin_only
-
-from tornado import web
-from tornado.escape import url_escape
+from jupyterhub.handlers import BaseHandler
 from tornado.httputil import url_concat
-import secrets
-import requests
-
+from jupyterhub.utils import admin_only
+from tornado.escape import url_escape
 from .orm import UserInfo
+import decimal, datetime
+from tornado import web
+import requests
+import secrets
+import json
+import os
+
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
@@ -104,6 +105,12 @@ class SignUpHandler(LocalBase):
         self.finish(response)
         return response
 
+def alchemyencoder(obj):
+    """JSON encoder function for SQLAlchemy special classes."""
+    if isinstance(obj, datetime.date):
+        return obj.isoformat()
+    elif isinstance(obj, decimal.Decimal):
+        return float(obj)
 
 class AuthorizationHandler(LocalBase):
     """Render the sign in page."""
@@ -111,16 +118,19 @@ class AuthorizationHandler(LocalBase):
     @admin_only
     async def get(self):
         mimetype = self.request.headers.get("content-type", None)
-        if mimetype == 'text/html':
+        res = self.db.query(UserInfo).all()
+        if mimetype == 'application/json':
+            users = json.dumps([dict(r) for r in res], default=alchemyencoder)
+            self.finish({"users": users})
+        else:
             self._register_template_path()
             html = self.render_template(
                 "autorization-area.html",
                 ask_email=self.authenticator.ask_email_on_signup,
-                users=self.db.query(UserInfo).all(),
+                users=res,
             )
             self.finish(html)
-        else:
-            self.finish({"users": self.db.query(UserInfo).all()})
+
 
 
 class ChangeAuthorizationHandler(LocalBase):
@@ -144,7 +154,6 @@ class ChangeAuthorizationHandler(LocalBase):
 class ResetPasswordHandler(LocalBase):
     
     async def get(self):
-        user = await self.get_current_user()
         html = self.render_template(
             'reset-password.html',
         )
@@ -152,7 +161,6 @@ class ResetPasswordHandler(LocalBase):
 
     async def post(self):
         username = self.get_body_argument("username", strip=False)
-        user = self.authenticator.get_user(username, None)
         message = "Check your emails"
         alert = "alert-success"
         new_password = secrets.token_hex(16)
@@ -182,7 +190,6 @@ class ResetPasswordHandler(LocalBase):
             r = requests.post(signup_url, json=data, headers=headers)
             r.raise_for_status()
         except requests.HTTPError as err:
-            err_code = err.response.status_code
             alert = "alert-danger"
             message = f"Something wrong happen"
         response = {
@@ -232,7 +239,6 @@ class ChangePasswordHandler(LocalBase):
         
     @admin_only
     async def put(self):
-        api_token = self.request.headers.get("Authorization", None)
         username = self.get_body_argument("username", strip=False)
         user = self.authenticator.get_user(username, None)
         message = ""

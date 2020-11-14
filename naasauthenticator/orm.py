@@ -1,12 +1,8 @@
-import base64
-import bcrypt
-import os
-import re
-from jupyterhub.orm import Base
-
-import onetimepass
 from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
 from sqlalchemy.orm import validates
+from jupyterhub.orm import Base
+import bcrypt
+import re
 
 
 class UserInfo(Base):
