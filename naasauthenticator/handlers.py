@@ -129,7 +129,7 @@ class ChangeAuthorizationHandler(LocalBase):
         mimetype = self.request.headers.get("Content-Type", None)
         is_authorized = self.get_body_argument("username", strip=False)
         user = UserInfo.update_authorization(self.db, slug, is_authorized)
-        self.finish({"user": data})
+        self.finish({"user": user})
             
     @admin_only
     async def get(self, slug):
@@ -139,7 +139,7 @@ class ChangeAuthorizationHandler(LocalBase):
             self.redirect(self.hub.base_url + "authorize")
         else:
             data = UserInfo.get_authorization(self.db, slug)
-            self.finish({"user": slug, "authorize", data})
+            self.finish({"user": slug, "data": data})
 
 
 class ResetPasswordHandler(LocalBase):
@@ -169,7 +169,7 @@ class ResetPasswordHandler(LocalBase):
         <br/><br/>If you never asked to reset, contact us in the chat box on our <a href="{WEBSITE_URL}">website</a>.
         """
         html = html.replace("{TEMP_PASSWORD}", new_password)
-        html = html.replace("{RESET_URL}", f"{os.environ.get("JUPYTERHUB_URL", "")}login?next=%2Fhub%2Fchange-password")
+        html = html.replace("{RESET_URL}", f'{os.environ.get("JUPYTERHUB_URL", "")}login?next=%2Fhub%2Fchange-password')
         html = html.replace("{WEBSITE_URL}", os.environ.get("JUPYTERHUB_URL", ""))
         content = html
         data = {
