@@ -34,23 +34,15 @@ class LocalBase(BaseHandler):
 class SignUpHandler(LocalBase):
     """Render the sign in page."""
 
+    @admin_only
     async def get(self):
-        api_token = self.request.headers.get("Authorization", None)
-        if api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
-            response = {
-                "error": True,
-                "message": "Ask an Cashstory Admin to do it",
-            }
-            self.finish(response)
-            return response
-        else:
-            users = self.authenticator.get_users(**user_info)
-            response = {
-                "users": users,
-                "message": "Here the list of users",
-            }
-            self.finish(response)
-            return response
+        users = self.authenticator.get_users(**user_info)
+        response = {
+            "users": users,
+            "message": "Here the list of users",
+        }
+        self.finish(response)
+        return response
             
     def get_result_message(self, user):
         alert = "alert-success"
@@ -75,26 +67,18 @@ class SignUpHandler(LocalBase):
 
         return alert, message
 
+    @admin_only
     async def delete(self):
-        api_token = self.request.headers.get("Authorization", None)
-        if api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
-            response = {
-                "error": True,
-                "message": "Ask an Cashstory Admin to do it",
-            }
-            self.finish(response)
-            return response
-        else:
-            user = self.authenticator.delete_user(self.get_body_argument("username", strip=False))
-            response = {
-                "users": user,
-                "message": "User deleted",
-            }
-            self.finish(response)
-            return response          
-        
+        user = self.authenticator.delete_user(self.get_body_argument("username", strip=False))
+        response = {
+            "users": user,
+            "message": "User deleted",
+        }
+        self.finish(response)
+        return response          
+    
+    @admin_only
     async def post(self):
-        api_token = self.request.headers.get("Authorization", None)
         user_info = {
             "username": self.get_body_argument("username", strip=False),
             "password": self.get_body_argument("password", strip=False),
@@ -106,13 +90,9 @@ class SignUpHandler(LocalBase):
         userExist = self.authenticator.get_user(**user_info)
         if userExist:
             alert = "alert-danger"
-            message = "User already exist" " Ask an Cashstory Admin to get access"
-        elif api_token and api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
-            user = self.authenticator.create_user(**user_info)
-            alert, message = self.get_result_message(user)
-        else:
-            alert = "alert-danger"
-            message = "Signup not allowed." " Ask an Cashstory Admin to get access"
+            message = "User already exist"
+        user = self.authenticator.create_user(**user_info)
+        alert, message = self.get_result_message(user)
 
         response = {
             "name": user_info.get("username"),
@@ -251,20 +231,16 @@ class ChangePasswordHandler(LocalBase):
         )
         self.finish(html)
         
-    @web.authenticated
+    @admin_only
     async def put(self):
         api_token = self.request.headers.get("Authorization", None)
         username = self.get_body_argument("username", strip=False)
         user = self.authenticator.get_user(username, None)
         message = ""
         alert = "alert-success"
-        if api_token and api_token == os.environ.get("ADMIN_API_TOKEN", "SHOULD_BE_CHANGED"):
-            new_password = self.get_body_argument("password", strip=False)
-            message = "Your password has been changed successfully"
-            self.authenticator.change_password(user.name, new_password)
-        else:
-            message = "You can't change your password, ask an Admin"
-            alert = "alert-danger"
+        new_password = self.get_body_argument("password", strip=False)
+        message = "Your password has been changed successfully"
+        self.authenticator.change_password(user.name, new_password)
 
         response = {
             "name": username,
