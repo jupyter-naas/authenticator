@@ -14,6 +14,6 @@ setup(
     author_email='bob@cashstory.com',
     license='3 Clause BSD',
     packages=find_packages(),
-    install_requires=['jupyterhub>=0.8', 'bcrypt', 'onetimepass'],
+    install_requires=['jupyterhub>=0.8', 'bcrypt', 'SQLAlchemy-serializer'],
     include_package_data=True,
 )

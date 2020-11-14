@@ -1,4 +1,3 @@
-from sqlalchemy.ext.serializer import dumps
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers.login import LoginHandler
 from jupyterhub.handlers import BaseHandler
@@ -36,7 +35,7 @@ class SignUpHandler(LocalBase):
     @admin_only
     async def get(self):
         res = self.authenticator.get_users()
-        users = dumps(res)
+        users = [item.to_dict() for item in res]
         response = {
             "users": users,
             "message": "Here the list of users",
@@ -114,7 +113,7 @@ class AuthorizationHandler(LocalBase):
         mimetype = self.request.headers.get("content-type", None)
         res = UserInfo.get_all(self.db)
         if mimetype == 'application/json':
-            users = dumps(res)
+            users = [item.to_dict() for item in res]
             self.finish({"users": users})
         else:
             self._register_template_path()
@@ -139,7 +138,7 @@ class ChangeAuthorizationHandler(LocalBase):
         mimetype = self.request.headers.get("content-type", None)
         if mimetype == 'application/json':
             data = UserInfo.get_authorization(self.db, slug)
-            self.finish({"user": slug, "data": data})
+            self.finish({"user": slug, "is_authorized": data})
         else:
             UserInfo.change_authorization(self.db, slug)
             self.redirect(self.hub.base_url + "authorize")

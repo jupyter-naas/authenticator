@@ -1,11 +1,12 @@
 from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
+from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from jupyterhub.orm import Base
 import bcrypt
 import re
 
 
-class UserInfo(Base):
+class UserInfo(Base, SerializerMixin):
     __tablename__ = 'users_info'
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
