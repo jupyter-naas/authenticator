@@ -82,7 +82,7 @@ class SignUpHandler(LocalBase):
             "username": self.get_body_argument("username", strip=False),
             "password": self.get_body_argument("password", strip=False),
             "is_authorized": True,
-            "email": self.get_body_argument("email", "", strip=False),
+            "email": self.get_body_argument("username", "", strip=False),
             "admin": self.get_body_argument("admin", False, strip=False),
         }
         alert, message = "", ""
