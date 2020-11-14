@@ -1,3 +1,4 @@
+from sqlalchemy.ext.serializer import dumps
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers.login import LoginHandler
 from jupyterhub.handlers import BaseHandler
@@ -5,21 +6,13 @@ from tornado.httputil import url_concat
 from jupyterhub.utils import admin_only
 from tornado.escape import url_escape
 from .orm import UserInfo
-import decimal, datetime
 from tornado import web
 import requests
 import secrets
-import json
 import os
 
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
-
-def to_json(res):
-    res_list = []
-    for row in res:
-        res_list.append(row._asdict()) 
-    return res_list
 
 class LocalBase(BaseHandler):
     def __init__(self, *args, **kwargs):
@@ -43,7 +36,7 @@ class SignUpHandler(LocalBase):
     @admin_only
     async def get(self):
         res = self.authenticator.get_users()
-        users = to_json(res)
+        users = dumps(res)
         response = {
             "users": users,
             "message": "Here the list of users",
@@ -121,7 +114,7 @@ class AuthorizationHandler(LocalBase):
         mimetype = self.request.headers.get("content-type", None)
         res = UserInfo.get_all(self.db)
         if mimetype == 'application/json':
-            users = to_json(res)
+            users = dumps(res)
             self.finish({"users": users})
         else:
             self._register_template_path()
