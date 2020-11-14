@@ -15,6 +15,16 @@ import os
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
+def alchemyencoder(obj):
+    """JSON encoder function for SQLAlchemy special classes."""
+    if isinstance(obj, datetime.date):
+        return obj.isoformat()
+    elif isinstance(obj, decimal.Decimal):
+        return float(obj)
+
+def to_json(res):
+    return json.dumps([dict(r) for r in res], default=alchemyencoder)
+
 
 class LocalBase(BaseHandler):
     def __init__(self, *args, **kwargs):
@@ -37,7 +47,8 @@ class SignUpHandler(LocalBase):
 
     @admin_only
     async def get(self):
-        users = self.authenticator.get_users(**user_info)
+        res = self.authenticator.get_users()
+        users = to_json(res)
         response = {
             "users": users,
             "message": "Here the list of users",
@@ -72,7 +83,7 @@ class SignUpHandler(LocalBase):
     async def delete(self):
         user = self.authenticator.delete_user(self.get_body_argument("username", strip=False))
         response = {
-            "users": user,
+            "user": user,
             "message": "User deleted",
         }
         self.finish(response)
@@ -105,12 +116,7 @@ class SignUpHandler(LocalBase):
         self.finish(response)
         return response
 
-def alchemyencoder(obj):
-    """JSON encoder function for SQLAlchemy special classes."""
-    if isinstance(obj, datetime.date):
-        return obj.isoformat()
-    elif isinstance(obj, decimal.Decimal):
-        return float(obj)
+
 
 class AuthorizationHandler(LocalBase):
     """Render the sign in page."""
@@ -120,7 +126,7 @@ class AuthorizationHandler(LocalBase):
         mimetype = self.request.headers.get("content-type", None)
         res = self.db.query(UserInfo).all()
         if mimetype == 'application/json':
-            users = json.dumps([dict(r) for r in res], default=alchemyencoder)
+            users = to_json(res)
             self.finish({"users": users})
         else:
             self._register_template_path()
