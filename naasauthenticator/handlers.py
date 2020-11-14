@@ -124,7 +124,6 @@ class AuthorizationHandler(LocalBase):
     @admin_only
     async def get(self):
         mimetype = self.request.headers.get("content-type", None)
-        print(mimetype)
         res = UserInfo.get_all(self.db)
         if mimetype == 'application/json':
             users = to_json(res)
@@ -134,7 +133,7 @@ class AuthorizationHandler(LocalBase):
             html = self.render_template(
                 "autorization-area.html",
                 ask_email=self.authenticator.ask_email_on_signup,
-                users=res,
+                users=res.all(),
             )
             self.finish(html)
 
