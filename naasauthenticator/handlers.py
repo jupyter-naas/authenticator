@@ -15,16 +15,11 @@ import os
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
-def alchemyencoder(obj):
-    """JSON encoder function for SQLAlchemy special classes."""
-    if isinstance(obj, datetime.date):
-        return obj.isoformat()
-    elif isinstance(obj, decimal.Decimal):
-        return float(obj)
-
 def to_json(res):
-    return json.dumps([dict(r) for r in res], default=alchemyencoder)
-
+    res_list = []
+    for obj in res:
+        res_list.append(obj.toDict()) 
+    return res_list
 
 class LocalBase(BaseHandler):
     def __init__(self, *args, **kwargs):
@@ -133,7 +128,7 @@ class AuthorizationHandler(LocalBase):
             html = self.render_template(
                 "autorization-area.html",
                 ask_email=self.authenticator.ask_email_on_signup,
-                users=res.all(),
+                users=res,
             )
             self.finish(html)
 
