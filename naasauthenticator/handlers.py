@@ -90,8 +90,9 @@ class SignUpHandler(LocalBase):
         if userExist:
             alert = "alert-danger"
             message = "User already exist"
-        user = self.authenticator.create_user(**user_info)
-        alert, message = self.get_result_message(user)
+        else :
+            user = self.authenticator.create_user(**user_info)
+            alert, message = self.get_result_message(user)
 
         response = {
             "name": user_info.get("username"),
