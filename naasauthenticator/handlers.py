@@ -170,7 +170,7 @@ class ResetPasswordHandler(LocalBase):
         <br/><br/>If you never asked to reset, contact us in the chat box on our <a href="{WEBSITE_URL}">website</a>.
         """
         html = html.replace("{TEMP_PASSWORD}", new_password)
-        html = html.replace("{RESET_URL}", f'{os.environ.get("JUPYTERHUB_URL", "")}login?next=%2Fhub%2Fchange-password')
+        html = html.replace("{RESET_URL}", f'{os.environ.get("JUPYTERHUB_URL", "")}/hub/login?next=%2Fhub%2Fchange-password')
         html = html.replace("{WEBSITE_URL}", os.environ.get("JUPYTERHUB_URL", ""))
         content = html
         data = {
