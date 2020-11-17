@@ -26,6 +26,6 @@ setup(
             "notebook>=5,<6",
         ]
     },
-    install_requires=["jupyterhub>=0.8", "bcrypt", "SQLAlchemy-serializer"],
+    install_requires=["jupyterhub>=1.2.1", "bcrypt", "SQLAlchemy-serializer"],
     include_package_data=True,
 )
