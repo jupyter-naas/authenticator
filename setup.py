@@ -15,7 +15,7 @@ setup(
     license='3 Clause BSD',
     packages=find_packages(),
     extras_require={
-        "dev": 
+        "dev": [
             "codecov",
             "flake8>=3,<4",
             "black",
