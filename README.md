@@ -20,7 +20,7 @@ Documentation is available [here](https://naas-authenticator.readthedocs.io)
 
 To run the tests locally, you can install the development dependencies:
 
-`$ pip install -r dev-requirements.txt`
+`$ pip install -e '.[dev]'`
 
 Then run tests with pytest:
 
