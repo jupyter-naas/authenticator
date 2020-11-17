@@ -14,6 +14,16 @@ setup(
     author_email='bob@cashstory.com',
     license='3 Clause BSD',
     packages=find_packages(),
+    extras_require={
+        "dev": 
+            "codecov",
+            "flake8>=3,<4",
+            "black",
+            "pytest>=3,<4",
+            "pytest-asyncio>=-0,<1",
+            "notebook>=5,<6",
+        ]
+    },
     install_requires=['jupyterhub>=0.8', 'bcrypt', 'SQLAlchemy-serializer'],
     include_package_data=True,
 )
