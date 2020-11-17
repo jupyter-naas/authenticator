@@ -36,7 +36,7 @@ jobs:
           git config --global user.name "GitHub Action"
           python3 -m black naasauthenticator
           python3 -m flake8 naasauthenticator
-          pytest --cov=./naasauthenticator --cov-report=xml 
+          # pytest --cov=./naasauthenticator --cov-report=xml 
       - name: Upload coverage to Codecov
         if: runner.os == 'Linux'
         uses: codecov/codecov-action@v1.0.3
