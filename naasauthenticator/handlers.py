@@ -13,6 +13,7 @@ import os
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
+
 class LocalBase(BaseHandler):
     def __init__(self, *args, **kwargs):
         self._loaded = False
@@ -42,10 +43,13 @@ class SignUpHandler(LocalBase):
         }
         self.finish(response)
         return response
-            
+
     def get_result_message(self, user):
         alert = "alert-success"
-        message = "The signup was successful. You can now go to " "home page and log in the system"
+        message = (
+            "The signup was successful. You can now go to "
+            "home page and log in the system"
+        )
         if not user:
             alert = "alert-danger"
             password_len = self.authenticator.minimum_password_length
@@ -68,14 +72,16 @@ class SignUpHandler(LocalBase):
 
     @admin_only
     async def delete(self):
-        user = self.authenticator.delete_user(self.get_body_argument("username", strip=False))
+        user = self.authenticator.delete_user(
+            self.get_body_argument("username", strip=False)
+        )
         response = {
             "data": user,
             "message": "User deleted",
         }
         self.finish(response)
-        return response          
-    
+        return response
+
     @admin_only
     async def post(self):
         user_info = {
@@ -90,7 +96,7 @@ class SignUpHandler(LocalBase):
         if userExist:
             alert = "alert-danger"
             message = "User already exist"
-        else :
+        else:
             user = self.authenticator.create_user(**user_info)
             alert, message = self.get_result_message(user)
 
@@ -105,7 +111,6 @@ class SignUpHandler(LocalBase):
         return response
 
 
-
 class AuthorizationHandler(LocalBase):
     """Render the sign in page."""
 
@@ -113,7 +118,7 @@ class AuthorizationHandler(LocalBase):
     async def get(self):
         mimetype = self.request.headers.get("content-type", None)
         res = UserInfo.get_all(self.db)
-        if mimetype == 'application/json':
+        if mimetype == "application/json":
             users = [item.to_dict() for item in res]
             self.finish({"data": users})
         else:
@@ -126,18 +131,17 @@ class AuthorizationHandler(LocalBase):
             self.finish(html)
 
 
-
 class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def put(self, slug):
         is_authorized = self.get_body_argument("username", strip=False)
         user = UserInfo.update_authorization(self.db, slug, is_authorized)
         self.finish({"data": user})
-            
+
     @admin_only
     async def get(self, slug):
         mimetype = self.request.headers.get("content-type", None)
-        if mimetype == 'application/json':
+        if mimetype == "application/json":
             data = UserInfo.get_authorization(self.db, slug)
             self.finish({"data": {"username": slug, "is_authorized": data}})
         else:
@@ -146,10 +150,9 @@ class ChangeAuthorizationHandler(LocalBase):
 
 
 class ResetPasswordHandler(LocalBase):
-    
     async def get(self):
         html = self.render_template(
-            'reset-password.html',
+            "reset-password.html",
         )
         self.finish(html)
 
@@ -170,7 +173,10 @@ class ResetPasswordHandler(LocalBase):
         <br/><br/>If you never asked to reset, contact us in the chat box on our <a href="{WEBSITE_URL}">website</a>.
         """
         html = html.replace("{TEMP_PASSWORD}", new_password)
-        html = html.replace("{RESET_URL}", f'{os.environ.get("JUPYTERHUB_URL", "")}/hub/login?next=%2Fhub%2Fchange-password')
+        html = html.replace(
+            "{RESET_URL}",
+            f'{os.environ.get("JUPYTERHUB_URL", "")}/hub/login?next=%2Fhub%2Fchange-password',
+        )
         html = html.replace("{WEBSITE_URL}", os.environ.get("JUPYTERHUB_URL", ""))
         content = html
         data = {
@@ -185,7 +191,7 @@ class ResetPasswordHandler(LocalBase):
             r.raise_for_status()
         except requests.HTTPError as err:
             alert = "alert-danger"
-            message = f"Something wrong happen"
+            message = f"Something wrong happen {err}"
         response = {
             "name": username,
             "message": message,
@@ -193,17 +199,22 @@ class ResetPasswordHandler(LocalBase):
         if alert == "alert-danger":
             response["error"] = True
         html = self.render_template(
-            'reset-password.html',
+            "reset-password.html",
             result_message=message,
             alert=alert,
         )
         self.finish(html)
-    
+
+
 class DeleteHandler(LocalBase):
     @admin_only
     async def get(self, slug):
-        UserInfo.delete_user(self.db, slug)
-        self.redirect("/authorize")
+        mimetype = self.request.headers.get("content-type", None)
+        data = UserInfo.delete_user(self.db, slug)
+        if mimetype == "application/json":
+            self.finish({"data": data})
+        else:
+            self.redirect("/authorize")
 
 
 class ChangePasswordHandler(LocalBase):
@@ -213,7 +224,7 @@ class ChangePasswordHandler(LocalBase):
     async def get(self):
         user = await self.get_current_user()
         html = self.render_template(
-            'change-password.html',
+            "change-password.html",
             user_name=user.name,
         )
         self.finish(html)
@@ -221,16 +232,16 @@ class ChangePasswordHandler(LocalBase):
     @web.authenticated
     async def post(self):
         user = await self.get_current_user()
-        new_password = self.get_body_argument('password', strip=False)
+        new_password = self.get_body_argument("password", strip=False)
         self.authenticator.change_password(user.name, new_password)
 
         html = self.render_template(
-            'change-password.html',
+            "change-password.html",
             user_name=user.name,
-            result_message='Your password has been changed successfully',
+            result_message="Your password has been changed successfully",
         )
         self.finish(html)
-        
+
     @admin_only
     async def put(self):
         username = self.get_body_argument("username", strip=False)

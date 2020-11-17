@@ -1,13 +1,11 @@
-import bcrypt
-import dbm
-import os
-from datetime import datetime
-from jupyterhub.auth import Authenticator
-from pathlib import Path
-
-from sqlalchemy import inspect
-from tornado import gen
 from traitlets import Bool, Integer, Unicode
+from jupyterhub.auth import Authenticator
+from datetime import datetime
+from sqlalchemy import inspect
+from pathlib import Path
+from tornado import gen
+import bcrypt
+import os
 
 from .handlers import (
     AuthorizationHandler,
@@ -27,7 +25,10 @@ class NaasAuthenticator(Authenticator):
     check_common_password = Bool(
         config=True,
         default=False,
-        help=("Creates a verification of password strength " "when a new user makes signup"),
+        help=(
+            "Creates a verification of password strength "
+            "when a new user makes signup"
+        ),
     )
     minimum_password_length = Integer(
         config=True,
@@ -37,7 +38,10 @@ class NaasAuthenticator(Authenticator):
     allowed_failed_logins = Integer(
         config=True,
         default=0,
-        help=("Configures the number of failed attempts a user can have " "before being blocked."),
+        help=(
+            "Configures the number of failed attempts a user can have "
+            "before being blocked."
+        ),
     )
     seconds_before_next_try = Integer(
         config=True,
@@ -149,7 +153,9 @@ class NaasAuthenticator(Authenticator):
 
     def create_user(self, username, password, **kwargs):
 
-        if not self.is_password_strong(password) or not self.validate_username(username):
+        if not self.is_password_strong(password) or not self.validate_username(
+            username
+        ):
             return
 
         encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
@@ -173,15 +179,11 @@ class NaasAuthenticator(Authenticator):
     def get_user(self, username, password, **kwargs):
         user = UserInfo.find(self.db, username)
         return user
-    
-    def delete_user(self, username, **kwargs):
-        user = UserInfo.delete_user(self.db, username)
-        return user
-    
+
     def get_users(self):
         user = UserInfo.get_all(self.db)
         return user
-    
+
     def change_password(self, username, new_password):
         user = UserInfo.find(self.db, username)
         user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())

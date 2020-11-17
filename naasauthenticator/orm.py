@@ -7,7 +7,7 @@ import re
 
 
 class UserInfo(Base, SerializerMixin):
-    __tablename__ = 'users_info'
+    __tablename__ = "users_info"
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
     password = Column(LargeBinary, nullable=False)
@@ -42,7 +42,7 @@ class UserInfo(Base, SerializerMixin):
         user.is_authorized = is_authorized
         db.commit()
         return user
-    
+
     @classmethod
     def get_authorization(cls, db, username):
         user = db.query(cls).filter(cls.username == username).first()
@@ -59,10 +59,9 @@ class UserInfo(Base, SerializerMixin):
     def get_all(cls, db):
         return db.query(cls).all()
 
-    @validates('email')
+    @validates("email")
     def validate_email(self, key, address):
         if not address:
             return
-        assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$",
-                        address)
+        assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", address)
         return address
