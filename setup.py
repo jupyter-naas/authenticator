@@ -22,6 +22,7 @@ setup(
             "black",
             "pytest>=3,<4",
             "pytest-asyncio>=-0,<1",
+            "pytest-cov>=2,<3",
             "notebook>=5,<6",
         ]
     },
