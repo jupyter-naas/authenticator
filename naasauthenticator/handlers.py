@@ -73,7 +73,7 @@ class SignUpHandler(LocalBase):
     @admin_only
     async def delete(self):
         user = self.authenticator.delete_user(
-            self.get_body_argument("username", strip=False)
+            {"name": self.get_body_argument("username", strip=False)}
         )
         response = {
             "data": user,
@@ -134,7 +134,7 @@ class AuthorizationHandler(LocalBase):
 class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def put(self, slug):
-        is_authorized = self.get_body_argument("username", strip=False)
+        is_authorized = self.get_body_argument("is_authorized", strip=False)
         user = UserInfo.update_authorization(self.db, slug, is_authorized)
         self.finish({"data": user})
 
