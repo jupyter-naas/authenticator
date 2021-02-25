@@ -4,6 +4,7 @@ from jupyterhub.handlers import BaseHandler
 from tornado.httputil import url_concat
 from jupyterhub.utils import admin_only
 from tornado.escape import url_escape
+from types import SimpleNamespace
 from .orm import UserInfo
 from tornado import web
 import requests
@@ -73,7 +74,7 @@ class SignUpHandler(LocalBase):
     @admin_only
     async def delete(self):
         user = self.authenticator.delete_user(
-            {"name": self.get_body_argument("username", strip=False)}
+            SimpleNamespace(name=self.get_body_argument("username", strip=False))
         )
         response = {
             "data": user,
