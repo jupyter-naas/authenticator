@@ -132,7 +132,8 @@ class AuthorizationHandler(LocalBase):
 class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def post(self, slug):
-        is_authorized = bool(self.get_body_argument("is_authorized", strip=False))
+        is_authorized = self.get_body_argument("is_authorized", strip=False)
+        is_authorized = True if is_authorized and is_authorized == 'True' else False
         UserInfo.update_authorization(self.db, slug, is_authorized)
         self.finish({"data": {"username": slug, "is_authorized": is_authorized}})
 
