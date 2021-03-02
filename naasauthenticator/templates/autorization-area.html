@@ -26,6 +26,9 @@
                     <a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a>
                 </td>
                 <td>
+                    <a class="btn btn-info" href="/hub/change-password/{{ user.username }}" role="button">Change Pwd</a>
+                </td>
+                <td>
                     <a class="btn btn-danger" href="/hub/delete/{{ user.username }}" role="button">Delete</a>
                 </td>
                 {% else %}
@@ -37,6 +40,9 @@
                 <td>No</td>
                 <td>
                     <a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a>
+                </td>
+                <td>
+                    <a class="btn btn-info" href="/hub/change-password/{{ user.username }}" role="button">Change Pwd</a>
                 </td>
                 <td>
                     <a class="btn btn-danger" href="/hub/delete/{{ user.username }}" role="button">Delete</a>
