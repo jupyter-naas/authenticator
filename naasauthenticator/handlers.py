@@ -91,7 +91,7 @@ class SignUpHandler(LocalBase):
             "admin": self.get_body_argument("admin", False, strip=False),
         }
         alert, message = "", ""
-        userExist = self.authenticator.get_user(**user_info)
+        userExist = self.authenticator.user_exists(user_info['username'])
         if userExist:
             alert = "alert-danger"
             message = "User already exist"
@@ -244,7 +244,7 @@ class ChangePasswordHandler(LocalBase):
     @admin_only
     async def put(self):
         username = self.get_body_argument("username", strip=False)
-        user = self.authenticator.get_user(username, None)
+        user = self.authenticator.get_user(username)
         message = ""
         alert = "alert-success"
         new_password = self.get_body_argument("password", strip=False)
