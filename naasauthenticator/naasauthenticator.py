@@ -185,7 +185,7 @@ class NaasAuthenticator(Authenticator):
             self.whitelist.add(username)
         return user_info
 
-    def get_user(self, username, password, **kwargs):
+    def get_user(self, username):
         user = UserInfo.find(self.db, username)
         return user
 
