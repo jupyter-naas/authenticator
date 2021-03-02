@@ -113,8 +113,26 @@ class SignUpHandler(LocalBase):
 
 
 class AuthorizationHandler(LocalBase):
-    """Render the auth in page."""
+    """Render the sign in page."""
 
+    @admin_only
+    async def get(self):
+        mimetype = self.request.headers.get("content-type", None)
+        res = UserInfo.get_all(self.db)
+        if mimetype == "application/json":
+            users = [item.to_dict() for item in res]
+            self.finish({"data": users})
+        else:
+            self._register_template_path()
+            html = self.render_template(
+                "autorization-area.html",
+                ask_email=self.authenticator.ask_email_on_signup,
+                users=res,
+            )
+            self.finish(html)
+
+
+class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def post(self, slug):
         is_authorized = self.get_body_argument("is_authorized", strip=False)
@@ -124,26 +142,12 @@ class AuthorizationHandler(LocalBase):
     @admin_only
     async def get(self, slug):
         mimetype = self.request.headers.get("content-type", None)
-        if slug:
-            if mimetype == "application/json":
-                data = UserInfo.get_authorization(self.db, slug)
-                self.finish({"data": {"username": slug, "is_authorized": data}})
-            else:
-                UserInfo.change_authorization(self.db, slug)
-                self.redirect(self.hub.base_url + "authorize")
+        if mimetype == "application/json":
+            data = UserInfo.get_authorization(self.db, slug)
+            self.finish({"data": {"username": slug, "is_authorized": data}})
         else:
-            res = UserInfo.get_all(self.db)
-            if mimetype == "application/json":
-                users = [item.to_dict() for item in res]
-                self.finish({"data": users})
-            else:
-                self._register_template_path()
-                html = self.render_template(
-                    "autorization-area.html",
-                    ask_email=self.authenticator.ask_email_on_signup,
-                    users=res,
-                )
-                self.finish(html)          
+            UserInfo.change_authorization(self.db, slug)
+            self.redirect(self.hub.base_url + "authorize")
 
 
 class ResetPasswordHandler(LocalBase):
@@ -211,7 +215,7 @@ class DeleteHandler(LocalBase):
         if mimetype == "application/json":
             self.finish({"data": data})
         else:
-            self.redirect("/authorize")
+            self.redirect("/authorized")
 
 
 class ChangePasswordHandler(LocalBase):

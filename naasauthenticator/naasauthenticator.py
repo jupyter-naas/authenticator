@@ -9,6 +9,7 @@ import os
 
 from .handlers import (
     AuthorizationHandler,
+    ChangeAuthorizationHandler,
     DeleteHandler,
     ResetPasswordHandler,
     ChangePasswordHandler,
@@ -199,8 +200,8 @@ class NaasAuthenticator(Authenticator):
             (r"/signup", SignUpHandler),
             (r"/login", LoginHandler),
             (r"/delete/([^/]*)", DeleteHandler),
-            (r"/authorize", AuthorizationHandler),
-            (r"/authorize/([^/]*)", AuthorizationHandler),
+            (r"/authorized", AuthorizationHandler),
+            (r"/authorize/([^/]*)", ChangeAuthorizationHandler),
             (r"/reset-password", ResetPasswordHandler),
             (r"/change-password", ChangePasswordHandler),
         ]
