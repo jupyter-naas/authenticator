@@ -9,7 +9,6 @@ import os
 
 from .handlers import (
     AuthorizationHandler,
-    ChangeAuthorizationHandler,
     DeleteHandler,
     ResetPasswordHandler,
     ChangePasswordHandler,
