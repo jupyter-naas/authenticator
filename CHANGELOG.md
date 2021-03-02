@@ -1,3 +1,9 @@
+## 0.1.0 (2021-03-02)
+
+### Feat
+
+- add changepassword admin
+
 ## 0.0.22 (2021-03-02)
 
 ### Fix
