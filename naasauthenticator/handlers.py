@@ -16,19 +16,17 @@ TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
 
 class LocalBase(BaseHandler):
-    def __init__(self, *args, **kwargs):
-        self._loaded = False
-        super().__init__(*args, **kwargs)
+    _template_dir_registered = False
 
-    def _register_template_path(self):
-        if self._loaded:
-            return
-        self.log.debug("Adding %s to template path", TEMPLATE_DIR)
-        loader = FileSystemLoader([TEMPLATE_DIR])
-        env = self.settings["jinja2_env"]
-        previous_loader = env.loader
-        env.loader = ChoiceLoader([previous_loader, loader])
-        self._loaded = True
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not LocalBase._template_dir_registered:
+            self.log.debug('Adding %s to template path', TEMPLATE_DIR)
+            loader = FileSystemLoader([TEMPLATE_DIR])
+            env = self.settings['jinja2_env']
+            previous_loader = env.loader
+            env.loader = ChoiceLoader([previous_loader, loader])
+            LocalBase._template_dir_registered = True
 
 
 class SignUpHandler(LocalBase):
@@ -123,8 +121,7 @@ class AuthorizationHandler(LocalBase):
             users = [item.to_dict() for item in res]
             self.finish({"data": users})
         else:
-            self._register_template_path()
-            html = self.render_template(
+            html = await self.render_template(
                 "autorization-area.html",
                 ask_email=self.authenticator.ask_email_on_signup,
                 users=res,
@@ -144,7 +141,8 @@ class ChangeAuthorizationHandler(LocalBase):
         mimetype = self.request.headers.get("content-type", None)
         if mimetype == "application/json":
             data = UserInfo.get_authorization(self.db, slug)
-            self.finish({"data": {"username": slug, "is_authorized": data}})
+            res = {"data": {"username": slug, "is_authorized": data}}
+            self.finish(res)
         else:
             UserInfo.change_authorization(self.db, slug)
             self.redirect(self.hub.base_url + "authorize")
@@ -152,7 +150,7 @@ class ChangeAuthorizationHandler(LocalBase):
 
 class ResetPasswordHandler(LocalBase):
     async def get(self):
-        html = self.render_template(
+        html = await self.render_template(
             "reset-password.html",
         )
         self.finish(html)
@@ -199,7 +197,7 @@ class ResetPasswordHandler(LocalBase):
         }
         if alert == "alert-danger":
             response["error"] = True
-        html = self.render_template(
+        html = await self.render_template(
             "reset-password.html",
             result_message=message,
             alert=alert,
@@ -224,7 +222,7 @@ class ChangePasswordHandler(LocalBase):
     @web.authenticated
     async def get(self):
         user = await self.get_current_user()
-        html = self.render_template(
+        html = await self.render_template(
             "change-password.html",
             user_name=user.name,
         )
@@ -236,7 +234,7 @@ class ChangePasswordHandler(LocalBase):
         new_password = self.get_body_argument("password", strip=False)
         self.authenticator.change_password(user.name, new_password)
 
-        html = self.render_template(
+        html = await self.render_template(
             "change-password.html",
             user_name=user.name,
             result_message="Your password has been changed successfully",
@@ -264,9 +262,35 @@ class ChangePasswordHandler(LocalBase):
         return response
 
 
+class ChangePasswordAdminHandler(LocalBase):
+    """Render the reset password page."""
+
+    @admin_only
+    async def get(self, user_name):
+        if not self.authenticator.user_exists(user_name):
+            raise web.HTTPError(404)
+        html = await self.render_template(
+            'change-password.html',
+            user_name=user_name,
+        )
+        self.finish(html)
+
+    @admin_only
+    async def post(self, user_name):
+        new_password = self.get_body_argument('password', strip=False)
+        self.authenticator.change_password(user_name, new_password)
+
+        message_template = 'The password for {} has been changed successfully'
+        html = await self.render_template(
+            'change-password.html',
+            user_name=user_name,
+            result_message=message_template.format(user_name),
+        )
+        self.finish(html)
+
+
 class LoginHandler(LoginHandler, LocalBase):
     def _render(self, login_error=None, username=None):
-        self._register_template_path()
         landing_url = os.getenv("LANDING_URL")
         crisp_website_id = os.getenv("CRISP_WEBSITE_ID")
         return self.render_template(
