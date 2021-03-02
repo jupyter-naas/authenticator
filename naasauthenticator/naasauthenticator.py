@@ -152,9 +152,17 @@ class NaasAuthenticator(Authenticator):
 
         return all(checks)
 
-    def create_user(self, username, password, **kwargs):
+    def user_exists(self, username):
+        return self.get_user(username) is not None
 
-        if not self.is_password_strong(password) or not self.validate_username(
+    def create_user(self, username, password, **kwargs):
+        username = self.normalize_username(username)
+
+        if self.user_exists(username):
+            return
+
+        if not self.is_password_strong(password) or \
+            not self.validate_username(
             username
         ):
             return
