@@ -1,3 +1,9 @@
+## 0.0.22 (2021-03-02)
+
+### Fix
+
+- add await for render template
+
 ## 0.0.21 (2021-03-02)
 
 ### Fix
