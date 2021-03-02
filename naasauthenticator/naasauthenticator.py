@@ -199,9 +199,9 @@ class NaasAuthenticator(Authenticator):
         native_handlers = [
             (r"/signup", SignUpHandler),
             (r"/login", LoginHandler),
-            (r"/delete/([^/]*)", DeleteHandler),
-            (r"/authorized", AuthorizationHandler),
+            (r"/authorize", AuthorizationHandler),
             (r"/authorize/([^/]*)", ChangeAuthorizationHandler),
+            (r"/delete/([^/]*)", DeleteHandler),
             (r"/reset-password", ResetPasswordHandler),
             (r"/change-password", ChangePasswordHandler),
         ]

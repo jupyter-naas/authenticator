@@ -215,7 +215,7 @@ class DeleteHandler(LocalBase):
         if mimetype == "application/json":
             self.finish({"data": data})
         else:
-            self.redirect("/authorized")
+            self.redirect("/authorize")
 
 
 class ChangePasswordHandler(LocalBase):
