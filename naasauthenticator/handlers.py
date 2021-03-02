@@ -116,7 +116,7 @@ class AuthorizationHandler(LocalBase):
     """Render the auth in page."""
 
     @admin_only
-    async def put(self, slug):
+    async def post(self, slug):
         is_authorized = self.get_body_argument("is_authorized", strip=False)
         user = UserInfo.update_authorization(self.db, slug, is_authorized)
         self.finish({"data": user})
