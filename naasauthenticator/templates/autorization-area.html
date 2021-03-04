@@ -1,9 +1,8 @@
 {% extends "page.html" %}
 {% block main %}
-<style>.marge_bottom{margin-bottom: 50px;}</style>
 <div class="container marge_bottom">
     <h1>Authorization Area</h1>
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Username</th>
@@ -23,7 +22,8 @@
                 {% endif %}
                 <td>Yes</td>
                 <td>
-                    <a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a>
+                    <a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}"
+                        role="button">Unauthorize</a>
                 </td>
                 <td>
                     <a class="btn btn-info" href="/hub/change-password/{{ user.username }}" role="button">Change Pwd</a>
@@ -39,7 +39,8 @@
                 {% endif %}
                 <td>No</td>
                 <td>
-                    <a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a>
+                    <a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}"
+                        role="button">Authorize</a>
                 </td>
                 <td>
                     <a class="btn btn-info" href="/hub/change-password/{{ user.username }}" role="button">Change Pwd</a>
@@ -54,9 +55,14 @@
     </table>
 </div>
 <style>
+    .table {
+        margin-bottom: 40px;
+        background-color: white;
+        color: black;
+    }
 
     body {
-        font-family: Helvetica,sans-serif;
+        font-family: Helvetica, sans-serif;
         font-size: 14px;
         font-weight: 400;
         color: white;
