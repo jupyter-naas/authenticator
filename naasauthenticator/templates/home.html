@@ -7,20 +7,51 @@
 <iframe src="/user-redirect/naas" width="100%" height="100%" class="naas_manager" frameborder="0">
 </iframe>
 {% endif %}
+{% if not default_server.active %}
 <div class="container">
     <div class="row">
-
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Naas Documentation</h5>
+                <p class="card-text">Read more and master Naas powerfull features</p>
+                <a href="https://naas.bitbook.io/naas" class="btn btn-primary">Open</a>
+            </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Naas Drivers Documentation</h5>
+                <p class="card-text">Conenct Naas to all your tools with the drivers</p>
+                <a href="https://naas.bitbook.io/drivers" class="btn btn-primary">Open</a>
+            </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Naas Awesome Notebooks</h5>
+                <p class="card-text">Find demo and usecase with your favorite tools, download it in your naas in one click!</p>
+                <a href="https://github.com/jupyter-naas/awesome-notebooks" class="btn btn-primary">Open</a>
+            </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Naas Youtube channel</h5>
+                <p class="card-text">Learn how to use Naas with step by step videos !</p>
+                <a href="https://www.youtube.com/channel/UCKKG5hzjXXU_rRdHHWQ8JHQ" class="btn btn-primary">Open</a>
+            </div>
+        </div>
     </div>
 </div>
+{% endif %}
 <style>
     body {
         color: white;
         background-color: #191b1d;
     }
+
     .naas_manager {
         min-height: 800px;
         padding-top: 20px;
     }
+
     .btn-primary {
         background-color: rgba(71, 221, 130, 1);
         border-color: rgba(71, 221, 130, 1);
