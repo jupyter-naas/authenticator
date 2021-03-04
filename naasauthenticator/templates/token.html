@@ -1,0 +1,30 @@
+{% extends "templates/token.html" %}
+
+{% block main %}
+{{ super() }}
+<style>
+
+    body {
+        font-family: Helvetica,sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        color: white;
+        background-color: #191b1d;
+    }
+
+    .btn-primary {
+        background-color: rgba(71, 221, 130, 1);
+        border-color: rgba(71, 221, 130, 1);
+    }
+
+    .btn-primary:active,
+    .btn-primary:focus,
+    .btn-primary:hover,
+    .btn-primary:active.focus,
+    .btn-primary:active:focus,
+    .btn-primary:active:hover {
+        background-color: #38B068;
+        border-color: #38B068;
+    }
+</style>
+{% endblock %}
