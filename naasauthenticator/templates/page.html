@@ -1,23 +1,61 @@
-{% extends "templates/page.html" %}
+{% extends "page.html" %}
 
 {% block title %}Naas hub{% endblock %}
 {% block favicon %}
 <link rel="icon" href="logo" type="image/x-icon">
 {% endblock %}
-
+{% if crisp_website_id %}
+<script
+  type="text/javascript">window.$crisp = []; window.CRISP_WEBSITE_ID = "{{ crisp_website_id }}"; (function () { d = document; s = d.createElement("script"); s.src = "https://client.crisp.chat/l.js"; s.async = 1; d.getElementsByTagName("head")[0].appendChild(s); })();</script>
+{% endif %}
 <style>
-
   body {
-      font-family: Helvetica,sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      color: white;
-      background-color: #191b1d;
+    font-family: Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: white;
+    --title-scale: 1;
+    background-color: #191b1d;
+  }
+
+  .naas_manager {
+    min-height: 800px;
+  }
+
+  .pt-2 {
+    padding-top: 20px;
+  }
+
+  .version_footer {
+    position: absolute;
+  }
+
+  .table {
+    margin-bottom: 40px;
+    background-color: white;
+    color: black;
+  }
+
+  a {
+    color: rgba(71, 221, 130, 1);
+  }
+
+  .warning {
+    background-color: #24272A !important;
+  }
+
+  .auth-form-body {
+    border-top: thin silver solid !important;
+  }
+
+  .naas-logo {
+    width: 100% !important;
+    height: 15rem;
   }
 
   .btn-primary {
-      background-color: rgba(71, 221, 130, 1);
-      border-color: rgba(71, 221, 130, 1);
+    background-color: rgba(71, 221, 130, 1);
+    border-color: rgba(71, 221, 130, 1);
   }
 
   .btn-primary:active,
@@ -26,8 +64,8 @@
   .btn-primary:active.focus,
   .btn-primary:active:focus,
   .btn-primary:active:hover {
-      background-color: #38B068;
-      border-color: #38B068;
+    background-color: #38B068;
+    border-color: #38B068;
   }
 </style>
 
@@ -41,7 +79,8 @@
 {% endif %}
 {% if services %}
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Services<span class="caret"></span></a>
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+    aria-expanded="false">Services<span class="caret"></span></a>
   <ul class="dropdown-menu">
     {% for service in services %}
     <li><a class="dropdown-item" href="{{service.prefix}}">{{service.name}}</a></li>
@@ -50,4 +89,3 @@
 </li>
 {% endif %}
 {% endblock %}
-
