@@ -1,3 +1,9 @@
+## 0.3.0 (2021-03-04)
+
+### Feat
+
+- add section in hub when no machine started
+
 ## 0.2.0 (2021-03-04)
 
 ### Feat
