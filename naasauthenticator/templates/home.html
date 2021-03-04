@@ -10,30 +10,30 @@
 {% if not default_server.active %}
 <div class="container">
     <div class="row">
-        <div class="col-3">
+        <div class="col-sm-3">
             <div class="card">
-                <img class="card-img-top" width="100%" src="/hub/logo" alt="Naas logo">
                 <div class="card-body">
+                    <img class="card-img-top" width="100%" src="/hub/logo" alt="Naas logo">
                     <h5 class="card-title">Naas Documentation</h5>
                     <p class="card-text">Read more and master Naas powerfull features</p>
                     <a href="https://naas.gitbook.io/naas" target="_blank" class="btn btn-primary">Open</a>
                 </div>
             </div>
         </div>
-        <div class="col-3">
+        <div class="col-sm-3">
             <div class="card">
-                <img class="card-img-top" width="100%" src="/hub/logo" alt="Naas logo">
                 <div class="card-body">
+                    <img class="card-img-top" width="100%" src="/hub/logo" alt="Naas logo">
                     <h5 class="card-title">Naas Drivers Documentation</h5>
                     <p class="card-text">Conenct Naas to all your tools with the drivers</p>
                     <a href="https://naas.gitbook.io/drivers" target="_blank" class="btn btn-primary">Open</a>
                 </div>
             </div>
         </div>
-        <div class="col-3">
+        <div class="col-sm-3">
             <div class="card">
-                <img class="card-img-top" width="100%" src="/hub/logo" alt="Naas logo">
                 <div class="card-body">
+                    <img class="card-img-top" width="100%" src="/hub/logo" alt="Naas logo">
                     <h5 class="card-title">Naas Awesome Notebooks</h5>
                     <p class="card-text">Find demo and usecase with your favorite tools, download it in your naas in one
                         click!</p>
@@ -41,44 +41,45 @@
                         class="btn btn-primary">Open</a>
                 </div>
             </div>
-            <div class="col-3">
-                <div class="card">
+        </div>
+        <div class="col-sm-3">
+            <div class="card">
+                <div class="card-body">
                     <img class="card-img-top" width="100%" src="/hub/logo" alt="Naas logo">
-                    <div class="card-body">
-                        <h5 class="card-title">Naas Youtube channel</h5>
-                        <p class="card-text">Learn how to use Naas with step by step videos !</p>
-                        <a href="https://www.youtube.com/channel/UCKKG5hzjXXU_rRdHHWQ8JHQ" target="_blank"
-                            class="btn btn-primary">Open</a>
-                    </div>
+                    <h5 class="card-title">Naas Youtube channel</h5>
+                    <p class="card-text">Learn how to use Naas with step by step videos !</p>
+                    <a href="https://www.youtube.com/channel/UCKKG5hzjXXU_rRdHHWQ8JHQ" target="_blank"
+                        class="btn btn-primary">Open</a>
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
-    <style>
-        body {
-            color: white;
-            background-color: #191b1d;
-        }
+</div>
+{% endif %}
+<style>
+    body {
+        color: white;
+        background-color: #191b1d;
+    }
 
-        .naas_manager {
-            min-height: 800px;
-            padding-top: 20px;
-        }
+    .naas_manager {
+        min-height: 800px;
+        padding-top: 20px;
+    }
 
-        .btn-primary {
-            background-color: rgba(71, 221, 130, 1);
-            border-color: rgba(71, 221, 130, 1);
-        }
+    .btn-primary {
+        background-color: rgba(71, 221, 130, 1);
+        border-color: rgba(71, 221, 130, 1);
+    }
 
-        .btn-primary:active,
-        .btn-primary:focus,
-        .btn-primary:hover,
-        .btn-primary:active.focus,
-        .btn-primary:active:focus,
-        .btn-primary:active:hover {
-            background-color: #38B068;
-            border-color: #38B068;
-        }
-    </style>
-    {% endblock %}
+    .btn-primary:active,
+    .btn-primary:focus,
+    .btn-primary:hover,
+    .btn-primary:active.focus,
+    .btn-primary:active:focus,
+    .btn-primary:active:hover {
+        background-color: #38B068;
+        border-color: #38B068;
+    }
+</style>
+{% endblock %}
