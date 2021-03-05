@@ -4,6 +4,7 @@
 {% block favicon %}
 <link rel="icon" href="logo" type="image/x-icon">
 {% endblock %}
+{% block main %}
 {% if crisp_website_id %}
 <script
   type="text/javascript">window.$crisp = []; window.CRISP_WEBSITE_ID = "{{ crisp_website_id }}"; (function () { d = document; s = d.createElement("script"); s.src = "https://client.crisp.chat/l.js"; s.async = 1; d.getElementsByTagName("head")[0].appendChild(s); })();</script>
@@ -68,7 +69,7 @@
     border-color: #38B068;
   }
 </style>
-
+{% endblock %}
 {% block nav_bar_left_items %}
 <li><a href="{{base_url}}home">Home</a></li>
 <li><a href="{{base_url}}change-password">Change password</a></li>
