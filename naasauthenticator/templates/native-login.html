@@ -1,11 +1,12 @@
 {% extends "page.html" %}
-{% if announcement_login %}
-{% set announcement = announcement_login %}
-{% endif %}
+
 {% block nav_bar %}
 {% endblock %}
 
-{% block login %}
+{% block main %}
+{% if announcement_login %}
+{% set announcement = announcement_login %}
+{% endif %}
 <div id="login-main" class="container">
     <form action="{{login_url}}?next={{next}}" method="post" role="form">
         <div>
@@ -51,6 +52,7 @@
     </form>
 </div>
 {% endblock %}
+
 {% block script %}
 {{ super() }}
 <script type="text/javascript">
