@@ -1,3 +1,40 @@
+## 0.3.9 (2021-03-05)
+
+### Fix
+
+- home text
+- authorized area
+- button size
+- admin
+- admin view
+- remove if running
+- text
+- typo
+- design cards
+- design cards
+- typo
+- design cards
+- erro design
+- admin
+- block
+- add missing block
+- error
+- error import
+- typo
+- error
+- remove useless dup code
+- design admin
+- add all missing template
+- design admin page
+- emoji size
+- margin
+- logo in naas
+- logo tab hub
+- logo and tab name
+- auth design
+- auth area
+- token page
+
 ## 0.3.8 (2021-03-04)
 
 ### Fix
