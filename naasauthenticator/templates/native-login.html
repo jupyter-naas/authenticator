@@ -3,22 +3,7 @@
 {% set announcement = announcement_login %}
 {% endif %}
 {% block main %}
-
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        let button = document.getElementById('eye');
-        button.addEventListener("click", function (e) {
-            let pwd = document.getElementById("password_input");
-            if (pwd.getAttribute("type") === "password") {
-                pwd.setAttribute("type", "text");
-                button.textContent = "🔑";
-            } else {
-                pwd.setAttribute("type", "password");
-                button.textContent = "👁"
-            }
-        });
-    });
-</script>
+{% endblock %}
 
 {% block nav_bar %}
 {% endblock %}
@@ -57,7 +42,7 @@
                     </button>
                 </span>
             </span>
-            <input type="submit" id="login_submit" class="btn btn-primary" value="Login" tabindex="3" />
+            <input type="submit" id="login_submit" class="btn btn-block pt-2 btn-primary" value="Login" tabindex="3" />
             {% if landing_url %}
             <div style="padding-top: 25px">
                 <p style="text-align: center;">
@@ -72,7 +57,20 @@
 {% endblock %}
 {% block script %}
 {{ super() }}
-<script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        let button = document.getElementById('eye');
+        button.addEventListener("click", function (e) {
+            let pwd = document.getElementById("password_input");
+            if (pwd.getAttribute("type") === "password") {
+                pwd.setAttribute("type", "text");
+                button.textContent = "🔑";
+            } else {
+                pwd.setAttribute("type", "password");
+                button.textContent = "👁"
+            }
+        });
+    });
     if (window.location.protocol === "http:") {
         // unhide http warning
         let warning = document.getElementById('insecure-login-warning');
