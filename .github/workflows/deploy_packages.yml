@@ -69,7 +69,7 @@ jobs:
       - run: echo ${{ steps.get-latest-tag.outputs.tag }}
       - name: Update lab file
         if: ${{ steps.regex-match.outputs.match != '' }}  
-        run: sed -i 's_AUTH_VERSION .*$_AUTH_VERSION ${{ steps.get-latest-tag.outputs.tag }}_' naas_lab/Dockerfile
+        run: sed -i 's/AUTH_VERSION .*$/AUTH_VERSION ${{ steps.get-latest-tag.outputs.tag }}/' naas_lab/Dockerfile
       - name: Setup github user
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: git config --global user.name "actions-user" && git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
