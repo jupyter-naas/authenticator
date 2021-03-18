@@ -1,3 +1,9 @@
+## 0.3.47 (2021-03-18)
+
+### Fix
+
+- add auto push version to lab conf
+
 ## 0.3.46 (2021-03-12)
 
 ### Fix
