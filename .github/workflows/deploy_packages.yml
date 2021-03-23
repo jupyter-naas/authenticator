@@ -75,11 +75,4 @@ jobs:
         run: git config --global user.name "actions-user" && git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Push lab file
         if: ${{ steps.regex-match.outputs.match != '' }}
-        run: 'cd naas_lab && git add Dockerfile && git commit -m "chore: update authenticator ${{ steps.get-latest-tag.outputs.tag }}" && git push'
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          repository: jupyter-naas/lab
-          event-type: pypip-deployed
-          client-payload: '{"ref": "${{ github.ref }}"}'
+        run: 'cd naas_lab && git add Dockerfile && git commit -m "fix(dependency): update authenticator ${{ steps.get-latest-tag.outputs.tag }}" && git push'
