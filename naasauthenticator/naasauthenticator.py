@@ -24,8 +24,8 @@ class NaasAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
     check_common_password = Bool(
+        False,
         config=True,
-        default=False,
         help=(
             "Creates a verification of password strength "
             "when a new user makes signup"
