@@ -18,8 +18,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install --no-cache-dir -r dev-requirements.txt
-          pip install .
+          pip install -e '.[dev]'
       - name: Run tests
         run: |
           flake8
