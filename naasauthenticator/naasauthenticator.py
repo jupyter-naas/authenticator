@@ -169,7 +169,7 @@ class NaasAuthenticator(Authenticator):
 
         encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         infos = {"username": username, "password": encoded_password}
-        if kwargs["admin"] and kwargs["admin"] == "true" and self.admin_users:
+        if kwargs and kwargs["admin"] and kwargs["admin"] == "true" and self.admin_users:
             self.admin_users.add(username)
         kwargs.pop("admin", None)
         infos.update(kwargs)
