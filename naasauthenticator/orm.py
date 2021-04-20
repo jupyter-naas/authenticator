@@ -1,7 +1,5 @@
 
-import base64
 import bcrypt
-import os
 import re
 from jupyterhub.orm import Base
 
