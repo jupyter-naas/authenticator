@@ -6,6 +6,7 @@ from pathlib import Path
 from tornado import gen
 import bcrypt
 import os
+import dbm
 
 from .handlers import (
     AuthorizationHandler,
@@ -84,10 +85,11 @@ class NaasAuthenticator(Authenticator):
 
     def add_login_attempt(self, username):
         if not self.login_attempts.get(username):
-            self.login_attempts[username] = {"count": 1, "time": datetime.now()}
+            self.login_attempts[username] = {'count': 1,
+                                             'time': datetime.now()}
         else:
-            self.login_attempts[username]["count"] += 1
-            self.login_attempts[username]["time"] = datetime.now()
+            self.login_attempts[username]['count'] += 1
+            self.login_attempts[username]['time'] = datetime.now()
 
     def can_try_to_login_again(self, username):
         login_attempts = self.login_attempts.get(username)
@@ -103,7 +105,7 @@ class NaasAuthenticator(Authenticator):
     def is_blocked(self, username):
         logins = self.login_attempts.get(username)
 
-        if not logins or logins["count"] < self.allowed_failed_logins:
+        if not logins or logins['count'] < self.allowed_failed_logins:
             return False
 
         if self.can_try_to_login_again(username):
@@ -116,10 +118,10 @@ class NaasAuthenticator(Authenticator):
 
     @gen.coroutine
     def authenticate(self, handler, data):
-        username = self.normalize_username(data["username"])
-        password = data["password"]
+        username = self.normalize_username(data['username'])
+        password = data['password']
 
-        user = UserInfo.find(self.db, username)
+        user = self.get_user(username)
         if not user:
             return
 
@@ -127,7 +129,10 @@ class NaasAuthenticator(Authenticator):
             if self.is_blocked(username):
                 return
 
-        validations = [user.is_authorized, user.is_valid_password(password)]
+        validations = [
+            user.is_authorized,
+            user.is_valid_password(password)
+        ]
 
         if all(validations):
             self.successful_login(username)
@@ -235,3 +240,17 @@ class NaasAuthenticator(Authenticator):
             os.remove(db_complete_path + ".db")
         else:
             os.remove(db_complete_path)
+
+    def add_data_from_firstuse(self):
+        with dbm.open(self.firstuse_db_path, 'c', 0o600) as db:
+            for user in db.keys():
+                password = db[user].decode()
+                new_user = self.create_user(user.decode(), password)
+                if not new_user:
+                    error = '''User {} was not created. Check password
+                               restrictions or username problems before trying
+                               again'''.format(user)
+                    raise ValueError(error)
+
+        if self.delete_firstuse_db_after_import:
+            self.delete_dbm_db()
