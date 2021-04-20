@@ -42,6 +42,8 @@ async def test_create_user(is_admin, expected_authorization, tmpcwd, app):
         auth.admin_users = {"johnsnow"}
 
     auth.create_user("johnsnow", "password")
+    if expected_authorization:
+        UserInfo.change_authorization(app.db, 'johnsnow')
     user_info = UserInfo.find(app.db, "johnsnow")
     assert user_info.username == "johnsnow"
     assert user_info.is_authorized == expected_authorization
