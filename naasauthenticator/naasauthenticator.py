@@ -80,7 +80,7 @@ class NaasAuthenticator(Authenticator):
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
-        if "users_info" not in inspector.get_table_names():
+        if 'users_info' not in inspector.get_table_names():
             UserInfo.__table__.create(self.db.bind)
 
     def add_login_attempt(self, username):

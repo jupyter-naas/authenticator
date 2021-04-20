@@ -20,12 +20,12 @@ setup(
             "commitizen>=2,<3",
             "flake8>=3,<4",
             "black",
-            "pytest>=3,<4",
-            "pytest-asyncio>=-0,<1",
+            "pytest>=3.7",
+            "pytest-asyncio",
             "pytest-cov>=2,<3",
             "notebook==6.3.0",
         ]
     },
-    install_requires=["jupyterhub==1.3.0", "bcrypt", "SQLAlchemy-serializer"],
+    install_requires=["jupyterhub==1.3.0", "bcrypt"],
     include_package_data=True,
 )

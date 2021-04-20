@@ -1,21 +1,27 @@
-from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
-from sqlalchemy_serializer import SerializerMixin
-from sqlalchemy.orm import validates
-from jupyterhub.orm import Base
+
+import base64
 import bcrypt
+import os
 import re
+from jupyterhub.orm import Base
+
+from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
+from sqlalchemy.orm import validates
 
 
-class UserInfo(Base, SerializerMixin):
+class UserInfo(Base):
     __tablename__ = "users_info"
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
     password = Column(LargeBinary, nullable=False)
     is_authorized = Column(Boolean, default=False)
     email = Column(String)
+    otp_secret = Column(String(16))
 
     def __init__(self, **kwargs):
         super(UserInfo, self).__init__(**kwargs)
+        if not self.otp_secret:
+            self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
     @classmethod
     def find(cls, db, username):
