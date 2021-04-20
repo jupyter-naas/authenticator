@@ -99,8 +99,6 @@ class NaasAuthenticator(Authenticator):
         user_info = UserInfo.find(self.db, username)
         if user_info and not user_info.is_authorized:
             return False
-        elif self.allowed_groups:
-            return self.check_allowed_groups(username, authentication)
         else:
             return super().check_allowed(username, authentication)
 
