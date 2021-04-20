@@ -105,7 +105,11 @@ async def test_handlers(app):
     assert handlers[0][0] == "/login"
     assert handlers[1][0] == "/signup"
     assert handlers[2][0] == "/authorize"
-    assert handlers[4][0] == "/change-password"
+    assert handlers[3][0] == '/authorize/([^/]*)'
+    assert handlers[4][0] == '/delete/([^/]*)'
+    assert handlers[5][0] == "/reset-password"
+    assert handlers[6][0] == '/change-password'
+    assert handlers[7][0] == '/change-password/([^/]+)'
 
 
 async def test_add_new_attempt_of_login(tmpcwd, app):

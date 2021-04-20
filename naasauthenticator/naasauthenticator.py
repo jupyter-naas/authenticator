@@ -206,8 +206,8 @@ class NaasAuthenticator(Authenticator):
 
     def get_handlers(self, app):
         native_handlers = [
-            (r"/signup", SignUpHandler),
             (r"/login", LoginHandler),
+            (r"/signup", SignUpHandler),
             (r"/authorize", AuthorizationHandler),
             (r"/authorize/([^/]*)", ChangeAuthorizationHandler),
             (r"/delete/([^/]*)", DeleteHandler),
