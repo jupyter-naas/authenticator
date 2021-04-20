@@ -1,7 +1,7 @@
 import dbm
 import os
 import pytest
-import time
+# import time
 from jupyterhub.tests.mocking import MockHub
 
 from naasauthenticator import NaasAuthenticator
