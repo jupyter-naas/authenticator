@@ -23,9 +23,9 @@ setup(
             "pytest>=3,<4",
             "pytest-asyncio>=-0,<1",
             "pytest-cov>=2,<3",
-            "notebook>=5,<6",
+            "notebook==6.3.0",
         ]
     },
-    install_requires=["jupyterhub>=1.2.1", "bcrypt", "SQLAlchemy-serializer"],
+    install_requires=["jupyterhub==1.3.0", "bcrypt", "SQLAlchemy-serializer"],
     include_package_data=True,
 )
