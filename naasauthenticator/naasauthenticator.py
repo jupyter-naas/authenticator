@@ -7,7 +7,7 @@ from tornado import gen
 import bcrypt
 import os
 import dbm
-
+import tornado.ioloop
 from .handlers import (
     AuthorizationHandler,
     ChangeAuthorizationHandler,
@@ -94,7 +94,7 @@ class NaasAuthenticator(Authenticator):
     def pre_spawn_start(self, user, spawner):
         user_info = UserInfo.find(self.db, user.name)
         if not user_info.is_authorized:
-            spawner.stop()
+            tornado.ioloop.add_future(spawner.stop)
 
     def check_allowed(self, username, authentication=None):
         user_info = UserInfo.find(self.db, username)
