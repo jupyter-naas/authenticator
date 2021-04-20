@@ -47,6 +47,12 @@ async def test_create_user(is_admin, expected_authorization, tmpcwd, app):
     user_info = UserInfo.find(app.db, "johnsnow")
     assert user_info.username == "johnsnow"
     assert user_info.is_authorized == expected_authorization
+    assert user_info.is_authorized == UserInfo.get_authorization(app.db, "johnsnow")
+
+    UserInfo.change_authorization(app.db, 'johnsnow')
+    assert UserInfo.get_authorization(app.db, "johnsnow") != expected_authorization
+    UserInfo.update_authorization(app.db, 'johnsnow', expected_authorization)
+    assert UserInfo.get_authorization(app.db, "johnsnow") == expected_authorization
 
 
 async def test_create_user_bas_characters(tmpcwd, app):
@@ -120,6 +126,7 @@ async def test_add_new_attempt_of_login(tmpcwd, app):
     assert auth.login_attempts["username"]["count"] == 1
     auth.add_login_attempt("username")
     assert auth.login_attempts["username"]["count"] == 2
+
 
 
 async def test_authentication_login_count(tmpcwd, app):

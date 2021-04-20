@@ -16,12 +16,9 @@ class UserInfo(Base):
     password = Column(LargeBinary, nullable=False)
     is_authorized = Column(Boolean, default=False)
     email = Column(String)
-    otp_secret = Column(String(16))
 
     def __init__(self, **kwargs):
         super(UserInfo, self).__init__(**kwargs)
-        if not self.otp_secret:
-            self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
     @classmethod
     def find(cls, db, username):
