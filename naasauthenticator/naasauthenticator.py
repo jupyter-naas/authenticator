@@ -91,6 +91,20 @@ class NaasAuthenticator(Authenticator):
             self.login_attempts[username]['count'] += 1
             self.login_attempts[username]['time'] = datetime.now()
 
+    def pre_spawn_start(self, user, spawner):
+        user_info = UserInfo.find(self.db, user.name)
+        if not user_info.is_authorized:
+            spawner.stop()
+
+    def check_allowed(self, username, authentication=None):
+        user_info = UserInfo.find(self.db, username)
+        if user_info and not user_info.is_authorized:
+            return False
+        elif self.allowed_groups:
+            return self.check_allowed_groups(username, authentication)
+        else:
+            return super().check_allowed(username, authentication)
+
     def can_try_to_login_again(self, username):
         login_attempts = self.login_attempts.get(username)
         if not login_attempts:
