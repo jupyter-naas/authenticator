@@ -29,9 +29,9 @@ pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 @pytest.mark.parametrize(
     "is_admin,expected_authorization",
     [
-        (False, False, False),
-        (True, False, True),
-        (False, True, True),
+        (False, False),
+        (True, True),
+        (False, True),
     ],
 )
 async def test_create_user(is_admin, expected_authorization, tmpcwd, app):
