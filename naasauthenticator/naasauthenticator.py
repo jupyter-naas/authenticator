@@ -24,7 +24,7 @@ class NaasAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
     check_common_password = Bool(
-        False,
+        default_value=False,
         config=True,
         help=(
             "Creates a verification of password strength "
@@ -33,12 +33,12 @@ class NaasAuthenticator(Authenticator):
     )
     minimum_password_length = Integer(
         config=True,
-        default=1,
+        default_value=1,
         help=("Check if the length of the password is at least this size on " "signup"),
     )
     allowed_failed_logins = Integer(
         config=True,
-        default=0,
+        default_value=0,
         help=(
             "Configures the number of failed attempts a user can have "
             "before being blocked."
@@ -46,18 +46,18 @@ class NaasAuthenticator(Authenticator):
     )
     seconds_before_next_try = Integer(
         config=True,
-        default=600,
+        default_value=600,
         help=(
             "Configures the number of seconds a user has to wait "
             "after being blocked. Default is 600."
         ),
     )
-    ask_email_on_signup = Bool(False, config=True, help="Asks for email on signup")
+    ask_email_on_signup = Bool(default_value=False, config=True, help="Asks for email on signup")
     import_from_firstuse = Bool(
-        False, config=True, help="Import users from FirstUse Authenticator database"
+        default_value=False, config=True, help="Import users from FirstUse Authenticator database"
     )
     firstuse_db_path = Unicode(
-        "passwords.dbm",
+        default_value="passwords.dbm",
         config=True,
         help="""
         Path to store the db file of FirstUse with username / password hash in
