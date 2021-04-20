@@ -52,7 +52,7 @@ jobs:
         with:
           username: ${{ secrets.PYPIP_USERNAME }} 
           password: ${{ secrets.PYPIP_PASSWORD }}
-      - uses: actions-ecosystem/action-get-latest-tag@v1.0.0
+      - uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag
       - uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
