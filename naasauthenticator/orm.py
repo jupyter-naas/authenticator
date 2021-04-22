@@ -18,6 +18,9 @@ class UserInfo(Base):
     def __init__(self, **kwargs):
         super(UserInfo, self).__init__(**kwargs)
 
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     @classmethod
     def find(cls, db, username):
         """Find a user info record by name.

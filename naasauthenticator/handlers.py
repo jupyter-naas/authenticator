@@ -34,8 +34,8 @@ class SignUpHandler(LocalBase):
 
     @admin_only
     async def get(self):
-        users = self.authenticator.get_users()
-        # users = [item.to_dict() for item in res]
+        res = self.authenticator.get_users()
+        users = [item.as_dict() for item in res]
         response = {
             "data": users,
             "message": "Here the list of users",
@@ -116,14 +116,15 @@ class AuthorizationHandler(LocalBase):
     @admin_only
     async def get(self):
         mimetype = self.request.headers.get("content-type", None)
-        users = self.authenticator.get_users()
+        res = self.authenticator.get_users()
         if mimetype == "application/json":
+            users = [item.as_dict() for item in res]
             self.finish({"data": users})
         else:
             html = await self.render_template(
                 "autorization-area.html",
                 ask_email=self.authenticator.ask_email_on_signup,
-                users=users,
+                users=res,
             )
             self.finish(html)
 

@@ -128,7 +128,6 @@ async def test_add_new_attempt_of_login(tmpcwd, app):
     assert auth.login_attempts["username"]["count"] == 2
 
 
-
 async def test_authentication_login_count(tmpcwd, app):
     auth = NaasAuthenticator(db=app.db)
     infos = {"username": "johnsnow", "password": "password"}
@@ -177,6 +176,18 @@ async def test_change_password(tmpcwd, app):
     auth.change_password("johnsnow", "newpassword")
     assert not user.is_valid_password("password")
     assert user.is_valid_password("newpassword")
+
+
+async def test_list_users(tmpcwd, app):
+    auth = NaasAuthenticator(db=app.db)
+    auth.create_user("johnsnow", "password")
+    auth.create_user("johnsnow2", "password2")
+
+    res = auth.get_users()
+    users = [item.as_dict() for item in res]
+    assert len(users) == 2
+    user = dict(users[0])
+    assert type(user) == dict
 
 
 async def test_delete_user(tmpcwd, app):
