@@ -86,7 +86,7 @@ class SignUpHandler(LocalBase):
         user_info = {
             "username": self.get_body_argument("username", strip=False),
             "password": self.get_body_argument("password", strip=False),
-            "is_authorized": True,
+            "is_authorized": self.get_body_argument("is_authorized", True, strip=False),
             "email": self.get_body_argument("username", "", strip=False),
             "admin": self.get_body_argument("admin", False, strip=False),
         }
@@ -132,8 +132,8 @@ class AuthorizationHandler(LocalBase):
 class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def post(self, slug):
-        is_authorized = self.get_body_argument("is_authorized", strip=False)
-        is_authorized = True if is_authorized and is_authorized == 'True' else False
+        is_authorized = self.get_body_argument("is_authorized", True, strip=False)
+        is_authorized = True if is_authorized and is_authorized == 'true' else False
         UserInfo.update_authorization(self.db, slug, is_authorized)
         self.finish({"data": {"username": slug, "is_authorized": is_authorized}})
 
