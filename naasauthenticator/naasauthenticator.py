@@ -206,7 +206,7 @@ class NaasAuthenticator(Authenticator):
         return user
 
     def get_users(self):
-        user = UserInfo.get_all(self.db)
+        user = self.db.query(UserInfo).all()
         return user
 
     def change_password(self, username, new_password):
