@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import inspect
 from pathlib import Path
 from tornado import gen
+import requests
 import bcrypt
 import os
 import dbm
@@ -129,27 +130,56 @@ class NaasAuthenticator(Authenticator):
 
     @gen.coroutine
     def authenticate(self, handler, data):
-        username = self.normalize_username(data['username'])
-        password = data['password']
+        print('Authenticate called')
+        print(data)
+        if 'bearer' in data:
+            bearer = data.get('bearer')
+            headers = {
+                'Authorization': 'Bearer ' + bearer
+            }
 
-        user = self.get_user(username)
-        if not user:
-            return
+            userAuth = requests.get('https://auth.dev.naas.ai/users/me/', headers=headers, data={})
+            if userAuth.status_code is 200:
+                data = userAuth.json()
+                username = data.get('username')
+                user = self.get_user(username)
+                if not user:
+                    print(f'User {username} not found in database!')
+                    return
+                
+                validations = [
+                    user.is_authorized,
+                ]
 
-        if self.allowed_failed_logins:
-            if self.is_blocked(username):
+                if all(validations):
+                    self.successful_login(username)
+                    return username
+                print('validation failed')
+            else:
+                print('Bearer not valid')
+                return
+        else: 
+            username = self.normalize_username(data['username'])
+            password = data['password']
+
+            user = self.get_user(username)
+            if not user:
                 return
 
-        validations = [
-            user.is_authorized,
-            user.is_valid_password(password)
-        ]
+            if self.allowed_failed_logins:
+                if self.is_blocked(username):
+                    return
 
-        if all(validations):
-            self.successful_login(username)
-            return username
+            validations = [
+                user.is_authorized,
+                user.is_valid_password(password)
+            ]
 
-        self.add_login_attempt(username)
+            if all(validations):
+                self.successful_login(username)
+                return username
+
+            self.add_login_attempt(username)
 
     def is_password_common(self, password):
         common_credentials_file = os.path.join(

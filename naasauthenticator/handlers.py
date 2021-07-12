@@ -151,6 +151,7 @@ class ChangeAuthorizationHandler(LocalBase):
 
 class ResetPasswordHandler(LocalBase):
     async def get(self):
+        print(dir(self))
         html = await self.render_template(
             "reset-password.html",
         )
@@ -291,9 +292,85 @@ class ChangePasswordAdminHandler(LocalBase):
 
 
 class LoginHandler(LoginHandler, LocalBase):
+    async def post(self):
+        # parse the arguments dict
+        data = {}
+        for arg in self.request.arguments:
+            data[arg] = self.get_argument(arg, strip=False)
+
+        auth_timer = self.statsd.timer('login.authenticate').start()
+        user = await self.login_user(data)
+        auth_timer.stop(send=False)
+
+        if user:
+            # register current user for subsequent requests to user (e.g. logging the request)
+            self._jupyterhub_user = user
+            self.redirect(self.get_next_url(user))
+        else:
+            html = await self._render(
+                login_error='Invalid username or password', username=data['username']
+            )
+            self.finish(html)
+
+    async def get(self):
+        self.statsd.incr('login.request')
+        user = self.current_user
+        if user:
+            # set new login cookie
+            # because single-user cookie may have been cleared or incorrect
+            self.set_login_cookie(user)
+            self.redirect(self.get_next_url(user), permanent=False)
+        if self.get_argument('bearer', default=False):
+            bearer = self.get_argument('bearer')
+
+            auth_timer = self.statsd.timer('login.authenticate').start()
+            user = await self.login_user({
+                'bearer': bearer
+            })
+
+            auth_timer.stop(send=False)
+
+            if user:
+                # register current user for subsequent requests to user (e.g. logging the request)
+
+                #TODO: Need to set cookie for subsequent queries (allow naas manager to authenticate user as well)
+
+                self._jupyterhub_user = user
+                self.redirect(self.get_next_url(user))
+            else:
+                html = await self._render(
+                    login_error='Invalid bearer token!'
+                )
+                self.finish(html)
+                return
+        else:
+            if self.authenticator.auto_login:
+                auto_login_url = self.authenticator.login_url(self.hub.base_url)
+                if auto_login_url == self.settings['login_url']:
+                    # auto_login without a custom login handler
+                    # means that auth info is already in the request
+                    # (e.g. REMOTE_USER header)
+                    user = await self.login_user()
+                    if user is None:
+                        # auto_login failed, just 403
+                        raise web.HTTPError(403)
+                    else:
+                        self.redirect(self.get_next_url(user))
+                else:
+                    if self.get_argument('next', default=False):
+                        auto_login_url = url_concat(
+                            auto_login_url, {'next': self.get_next_url()}
+                        )
+                    self.redirect(auto_login_url)
+                return
+            username = self.get_argument('username', default='')
+            self.finish(await self._render(username=username))
+
     def _render(self, login_error=None, username=None):
         landing_url = os.getenv("LANDING_URL")
         crisp_website_id = os.getenv("CRISP_WEBSITE_ID")
+        auth_url = os.getenv('AUTH_URL', 'http://127.0.0.1:5000')
+
         return self.render_template(
             "native-login.html",
             next=url_escape(self.get_argument("next", default="")),
@@ -303,6 +380,7 @@ class LoginHandler(LoginHandler, LocalBase):
             login_url=self.settings["login_url"],
             landing_url=landing_url,
             crisp_website_id=crisp_website_id,
+            auth_url=auth_url,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
                 {"next": self.get_argument("next", "")},
