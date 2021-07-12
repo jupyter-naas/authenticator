@@ -372,7 +372,7 @@ class LoginHandler(LoginHandler, LocalBase):
 
         return self.render_template(
             "native-login.html",
-            next=url_escape(self.get_argument("next", default="")),
+            next=url_escape(self.get_argument("next", default="/hub")),
             username=username,
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
