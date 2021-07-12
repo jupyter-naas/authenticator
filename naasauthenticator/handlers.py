@@ -151,7 +151,6 @@ class ChangeAuthorizationHandler(LocalBase):
 
 class ResetPasswordHandler(LocalBase):
     async def get(self):
-        print(dir(self))
         html = await self.render_template(
             "reset-password.html",
         )
