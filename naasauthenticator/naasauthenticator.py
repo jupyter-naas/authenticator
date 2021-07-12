@@ -139,7 +139,7 @@ class NaasAuthenticator(Authenticator):
             }
 
             userAuth = requests.get('https://auth.dev.naas.ai/users/me/', headers=headers, data={})
-            if userAuth.status_code is 200:
+            if userAuth.status_code == 200:
                 data = userAuth.json()
                 username = data.get('username')
                 user = self.get_user(username)
