@@ -3,6 +3,7 @@ from jupyterhub.handlers.login import LoginHandler
 from jupyterhub.handlers import BaseHandler
 from tornado.httputil import url_concat
 from jupyterhub.utils import admin_only
+from urllib.parse import urlparse
 from tornado.escape import url_escape
 from types import SimpleNamespace
 from .orm import UserInfo
@@ -14,6 +15,25 @@ import os
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
+def url_path_join(*pieces):
+    """Join components of url into a relative url.
+    Use to prevent double slash when joining subpath. This will leave the
+    initial and final / in place.
+    Copied from `notebook.utils.url_path_join`.
+    """
+    initial = pieces[0].startswith('/')
+    final = pieces[-1].endswith('/')
+    stripped = [s.strip('/') for s in pieces]
+    result = '/'.join(s for s in stripped if s)
+
+    if initial:
+        result = '/' + result
+    if final:
+        result = result + '/'
+    if result == '//':
+        result = '/'
+
+    return result
 
 class LocalBase(BaseHandler):
     _template_dir_registered = False
@@ -27,6 +47,94 @@ class LocalBase(BaseHandler):
             previous_loader = env.loader
             env.loader = ChoiceLoader([previous_loader, loader])
             LocalBase._template_dir_registered = True
+    
+    def get_next_url(self, user=None, default=None):
+        """Get the next_url for login redirect
+        Default URL after login:
+        - if redirect_to_server (default): send to user's own server
+        - else: /hub/home
+        """
+        next_url = self.get_argument('next', default='')
+        # protect against some browsers' buggy handling of backslash as slash
+        next_url = next_url.replace('\\', '%5C')
+        if (next_url + '/').startswith(
+            (
+                '%s://%s/' % (self.request.protocol, self.request.host),
+                '//%s/' % self.request.host,
+            )
+        ) or (
+            self.subdomain_host
+            and urlparse(next_url).netloc
+            and ("." + urlparse(next_url).netloc).endswith(
+                "." + urlparse(self.subdomain_host).netloc
+            )
+        ):
+            # treat absolute URLs for our host as absolute paths:
+            # below, redirects that aren't strictly paths
+            parsed = urlparse(next_url)
+            next_url = parsed.path
+            if parsed.query:
+                next_url = next_url + '?' + parsed.query
+            if parsed.fragment:
+                next_url = next_url + '#' + parsed.fragment
+
+        # if it still has host info, it didn't match our above check for *this* host
+        if next_url and (
+            ('://' in next_url and next_url.index('://') < next_url.index('?'))
+            or next_url.startswith('//')
+            or not next_url.startswith('/')
+        ):
+            self.log.warning("Disallowing redirect outside JupyterHub: %r", next_url)
+            next_url = ''
+
+        if next_url and next_url.startswith(url_path_join(self.base_url, 'user/')):
+            # add /hub/ prefix, to ensure we redirect to the right user's server.
+            # The next request will be handled by SpawnHandler,
+            # ultimately redirecting to the logged-in user's server.
+            without_prefix = next_url[len(self.base_url) :]
+            next_url = url_path_join(self.hub.base_url, without_prefix)
+            self.log.warning(
+                "Redirecting %s to %s. For sharing public links, use /user-redirect/",
+                self.request.uri,
+                next_url,
+            )
+
+        # this is where we know if next_url is coming from ?next= param or we are using a default url
+        if next_url:
+            next_url_from_param = True
+        else:
+            next_url_from_param = False
+
+        if not next_url:
+            # custom default URL, usually passed because user landed on that page but was not logged in
+            if default:
+                next_url = default
+            else:
+                # As set in jupyterhub_config.py
+                if callable(self.default_url):
+                    next_url = self.default_url(self)
+                else:
+                    next_url = self.default_url
+
+        if not next_url:
+            # default URL after login
+            # if self.redirect_to_server, default login URL initiates spawn,
+            # otherwise send to Hub home page (control panel)
+            if user and self.redirect_to_server:
+                if user.spawner.active:
+                    # server is active, send to the user url
+                    next_url = user.url
+                else:
+                    # send to spawn url
+                    next_url = url_path_join(self.hub.base_url, 'spawn')
+            else:
+                next_url = url_path_join(self.hub.base_url, 'home')
+
+        if not next_url_from_param:
+            # when a request made with ?next=... assume all the params have already been encoded
+            # otherwise, preserve params from the current request across the redirect
+            next_url = self.append_query_parameters(next_url, exclude=['next'])
+        return next_url
 
 
 class SignUpHandler(LocalBase):
