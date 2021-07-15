@@ -25,4 +25,3 @@ To run the tests locally, you can install the development dependencies:
 Then run tests with pytest:
 
 `$ pytest`
-
