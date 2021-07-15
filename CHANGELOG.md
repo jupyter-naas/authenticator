@@ -1,3 +1,9 @@
+## 0.4.4 (2021-07-15)
+
+### Fix
+
+- **Authenticatioon**: Add missing trailing /
+
 ## 0.4.3 (2021-07-15)
 
 ### Fix
