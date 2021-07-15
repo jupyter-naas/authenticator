@@ -93,7 +93,7 @@ class LocalBase(BaseHandler):
             # add /hub/ prefix, to ensure we redirect to the right user's server.
             # The next request will be handled by SpawnHandler,
             # ultimately redirecting to the logged-in user's server.
-            without_prefix = next_url[len(self.base_url) :]
+            without_prefix = next_url[len(self.base_url) :]  # noqa: E203
             next_url = url_path_join(self.hub.base_url, without_prefix)
             self.log.warning(
                 "Redirecting %s to %s. For sharing public links, use /user-redirect/",
