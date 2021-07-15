@@ -1,3 +1,19 @@
+## 0.4.0 (2021-07-15)
+
+### Feat
+
+- **get_next_url**: Customize get_next_url to handle more usecases
+- **Bearer**: Make it possible to handle Bearer token
+
+### Fix
+
+- **font-color**: Fix oauth links font color
+- **next**: make sure there is always a next= value for oauth to redirect properly
+
+### Refactor
+
+- Remove unwanted print
+
 ## 0.3.80 (2021-04-22)
 
 ### Fix
