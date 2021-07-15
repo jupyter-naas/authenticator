@@ -53,9 +53,13 @@ class NaasAuthenticator(Authenticator):
             "after being blocked. Default is 600."
         ),
     )
-    ask_email_on_signup = Bool(default_value=False, config=True, help="Asks for email on signup")
+    ask_email_on_signup = Bool(
+        default_value=False, config=True, help="Asks for email on signup"
+    )
     import_from_firstuse = Bool(
-        default_value=False, config=True, help="Import users from FirstUse Authenticator database"
+        default_value=False,
+        config=True,
+        help="Import users from FirstUse Authenticator database",
     )
     firstuse_db_path = Unicode(
         default_value="passwords.dbm",
@@ -80,16 +84,15 @@ class NaasAuthenticator(Authenticator):
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
-        if 'users_info' not in inspector.get_table_names():
+        if "users_info" not in inspector.get_table_names():
             UserInfo.__table__.create(self.db.bind)
 
     def add_login_attempt(self, username):
         if not self.login_attempts.get(username):
-            self.login_attempts[username] = {'count': 1,
-                                             'time': datetime.now()}
+            self.login_attempts[username] = {"count": 1, "time": datetime.now()}
         else:
-            self.login_attempts[username]['count'] += 1
-            self.login_attempts[username]['time'] = datetime.now()
+            self.login_attempts[username]["count"] += 1
+            self.login_attempts[username]["time"] = datetime.now()
 
     def pre_spawn_start(self, user, spawner):
         user_info = UserInfo.find(self.db, user.name)
@@ -117,7 +120,7 @@ class NaasAuthenticator(Authenticator):
     def is_blocked(self, username):
         logins = self.login_attempts.get(username)
 
-        if not logins or logins['count'] < self.allowed_failed_logins:
+        if not logins or logins["count"] < self.allowed_failed_logins:
             return False
 
         if self.can_try_to_login_again(username):
@@ -130,23 +133,23 @@ class NaasAuthenticator(Authenticator):
 
     @gen.coroutine
     def authenticate(self, handler, data):
-        print('Authenticate called')
+        print("Authenticate called")
         print(data)
-        if 'bearer' in data:
-            bearer = data.get('bearer')
-            headers = {
-                'Authorization': 'Bearer ' + bearer
-            }
+        if "bearer" in data:
+            bearer = data.get("bearer")
+            headers = {"Authorization": "Bearer " + bearer}
 
-            userAuth = requests.get('https://auth.dev.naas.ai/users/me/', headers=headers, data={})
+            userAuth = requests.get(
+                "https://auth.dev.naas.ai/users/me/", headers=headers, data={}
+            )
             if userAuth.status_code == 200:
                 data = userAuth.json()
-                username = data.get('username')
+                username = data.get("username")
                 user = self.get_user(username)
                 if not user:
-                    print(f'User {username} not found in database!')
+                    print(f"User {username} not found in database!")
                     return
-                
+
                 validations = [
                     user.is_authorized,
                 ]
@@ -154,13 +157,13 @@ class NaasAuthenticator(Authenticator):
                 if all(validations):
                     self.successful_login(username)
                     return username
-                print('validation failed')
+                print("validation failed")
             else:
-                print('Bearer not valid')
+                print("Bearer not valid")
                 return
-        else: 
-            username = self.normalize_username(data['username'])
-            password = data['password']
+        else:
+            username = self.normalize_username(data["username"])
+            password = data["password"]
 
             user = self.get_user(username)
             if not user:
@@ -170,10 +173,7 @@ class NaasAuthenticator(Authenticator):
                 if self.is_blocked(username):
                     return
 
-            validations = [
-                user.is_authorized,
-                user.is_valid_password(password)
-            ]
+            validations = [user.is_authorized, user.is_valid_password(password)]
 
             if all(validations):
                 self.successful_login(username)
@@ -207,15 +207,19 @@ class NaasAuthenticator(Authenticator):
         if self.user_exists(username):
             return
 
-        if not self.is_password_strong(password) or \
-            not self.validate_username(
+        if not self.is_password_strong(password) or not self.validate_username(
             username
         ):
             return
 
         encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         infos = {"username": username, "password": encoded_password}
-        if kwargs and kwargs["admin"] and kwargs["admin"] == "true" and self.admin_users:
+        if (
+            kwargs
+            and kwargs["admin"]
+            and kwargs["admin"] == "true"
+            and self.admin_users
+        ):
             self.admin_users.add(username)
         kwargs.pop("admin", None)
         infos.update(kwargs)
@@ -259,7 +263,7 @@ class NaasAuthenticator(Authenticator):
             (r"/delete/([^/]*)", DeleteHandler),
             (r"/reset-password", ResetPasswordHandler),
             (r"/change-password", ChangePasswordHandler),
-            (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
+            (r"/change-password/([^/]+)", ChangePasswordAdminHandler),
         ]
         return native_handlers
 
@@ -283,14 +287,16 @@ class NaasAuthenticator(Authenticator):
             os.remove(db_complete_path)
 
     def add_data_from_firstuse(self):
-        with dbm.open(self.firstuse_db_path, 'c', 0o600) as db:
+        with dbm.open(self.firstuse_db_path, "c", 0o600) as db:
             for user in db.keys():
                 password = db[user].decode()
                 new_user = self.create_user(user.decode(), password)
                 if not new_user:
-                    error = '''User {} was not created. Check password
+                    error = """User {} was not created. Check password
                                restrictions or username problems before trying
-                               again'''.format(user)
+                               again""".format(
+                        user
+                    )
                     raise ValueError(error)
 
         if self.delete_firstuse_db_after_import:

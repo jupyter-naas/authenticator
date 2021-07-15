@@ -1,4 +1,3 @@
-
 import bcrypt
 import re
 from jupyterhub.orm import Base

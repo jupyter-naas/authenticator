@@ -1,6 +1,7 @@
 import dbm
 import os
 import pytest
+
 # import time
 from jupyterhub.tests.mocking import MockHub
 
@@ -35,7 +36,7 @@ pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
     ],
 )
 async def test_create_user(is_admin, expected_authorization, tmpcwd, app):
-    """Test method create_user for new user and authorization """
+    """Test method create_user for new user and authorization"""
     auth = NaasAuthenticator(db=app.db)
 
     if is_admin:
@@ -43,15 +44,15 @@ async def test_create_user(is_admin, expected_authorization, tmpcwd, app):
 
     auth.create_user("johnsnow", "password")
     if expected_authorization:
-        UserInfo.change_authorization(app.db, 'johnsnow')
+        UserInfo.change_authorization(app.db, "johnsnow")
     user_info = UserInfo.find(app.db, "johnsnow")
     assert user_info.username == "johnsnow"
     assert user_info.is_authorized == expected_authorization
     assert user_info.is_authorized == UserInfo.get_authorization(app.db, "johnsnow")
 
-    UserInfo.change_authorization(app.db, 'johnsnow')
+    UserInfo.change_authorization(app.db, "johnsnow")
     assert UserInfo.get_authorization(app.db, "johnsnow") != expected_authorization
-    UserInfo.update_authorization(app.db, 'johnsnow', expected_authorization)
+    UserInfo.update_authorization(app.db, "johnsnow", expected_authorization)
     assert UserInfo.get_authorization(app.db, "johnsnow") == expected_authorization
 
 
@@ -111,11 +112,11 @@ async def test_handlers(app):
     assert handlers[0][0] == "/login"
     assert handlers[1][0] == "/signup"
     assert handlers[2][0] == "/authorize"
-    assert handlers[3][0] == '/authorize/([^/]*)'
-    assert handlers[4][0] == '/delete/([^/]*)'
+    assert handlers[3][0] == "/authorize/([^/]*)"
+    assert handlers[4][0] == "/delete/([^/]*)"
     assert handlers[5][0] == "/reset-password"
-    assert handlers[6][0] == '/change-password'
-    assert handlers[7][0] == '/change-password/([^/]+)'
+    assert handlers[6][0] == "/change-password"
+    assert handlers[7][0] == "/change-password/([^/]+)"
 
 
 async def test_add_new_attempt_of_login(tmpcwd, app):
@@ -163,7 +164,7 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     infos["password"] = "password"
     response = await auth.authenticate(app, infos)
     assert not response
-    # TODO fix this test 
+    # TODO fix this test
     # time.sleep(12)
     # response = await auth.authenticate(app, infos)
     # assert response
