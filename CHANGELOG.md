@@ -1,3 +1,9 @@
+## 0.4.3 (2021-07-15)
+
+### Fix
+
+- **Auth**: Get auth_url from environ instead of hardcoded one
+
 ## 0.4.2 (2021-07-15)
 
 ### Fix
