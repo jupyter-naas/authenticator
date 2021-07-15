@@ -139,7 +139,7 @@ class NaasAuthenticator(Authenticator):
             bearer = data.get("bearer")
             headers = {"Authorization": "Bearer " + bearer}
             auth_url = os.environ.get("AUTH_URL", "https://auth.dev.naas.ai")
-            userAuth = requests.get(f"{auth_url}/users/me", headers=headers, data={})
+            userAuth = requests.get(f"{auth_url}/users/me/", headers=headers, data={})
             if userAuth.status_code == 200:
                 data = userAuth.json()
                 username = data.get("username")
