@@ -154,6 +154,9 @@ class NaasAuthenticator(Authenticator):
                     return username
                 else:
                     data['error'] = DISABLED_USER_MESSAGE
+            elif userAuth.status_code == 400:
+                data['error'] = DISABLED_USER_MESSAGE
+                return
             else:
                 data['error'] = "Invalid bearer token!"
                 return
