@@ -1,3 +1,9 @@
+## 0.5.0 (2021-08-25)
+
+### Feat
+
+- **Error-messages**: Improved error messages
+
 ## 0.4.4 (2021-07-15)
 
 ### Fix
