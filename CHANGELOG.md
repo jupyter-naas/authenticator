@@ -1,3 +1,9 @@
+## 0.6.0 (2021-08-25)
+
+### Feat
+
+- **Authorization**: Handle 400 status code
+
 ## 0.5.0 (2021-08-25)
 
 ### Feat
