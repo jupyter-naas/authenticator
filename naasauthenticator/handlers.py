@@ -416,8 +416,11 @@ class LoginHandler(LoginHandler, LocalBase):
             self._jupyterhub_user = user
             self.redirect(self.get_next_url(user))
         else:
+            error_message = "Invalid username or password"
+            if 'error' in data:
+                error_message = data['error']
             html = await self._render(
-                login_error="Invalid username or password", username=data["username"]
+                login_error=error_message, username=data["username"]
             )
             self.finish(html)
 
@@ -433,7 +436,8 @@ class LoginHandler(LoginHandler, LocalBase):
             bearer = self.get_argument("bearer")
 
             auth_timer = self.statsd.timer("login.authenticate").start()
-            user = await self.login_user({"bearer": bearer})
+            data = {"bearer": bearer}
+            user = await self.login_user(data)
 
             auth_timer.stop(send=False)
 
@@ -445,7 +449,11 @@ class LoginHandler(LoginHandler, LocalBase):
                 self._jupyterhub_user = user
                 self.redirect(self.get_next_url(user))
             else:
-                html = await self._render(login_error="Invalid bearer token!")
+                error_message = "Invalid bearer token!"
+                if 'error' in data:
+                    error_message = data['error']
+
+                html = await self._render(login_error=error_message)
                 self.finish(html)
                 return
         else:

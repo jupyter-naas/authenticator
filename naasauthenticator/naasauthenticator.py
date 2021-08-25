@@ -20,6 +20,7 @@ from .handlers import (
 )
 from .orm import UserInfo
 
+DISABLED_USER_MESSAGE = "You are not authorized anymore, please check your emails for more details."
 
 class NaasAuthenticator(Authenticator):
 
@@ -145,19 +146,16 @@ class NaasAuthenticator(Authenticator):
                 username = data.get("username")
                 user = self.get_user(username)
                 if not user:
-                    print(f"User {username} not found in database!")
+                    data['error'] = "User not found!"
                     return
 
-                validations = [
-                    user.is_authorized,
-                ]
-
-                if all(validations):
+                if all([user.is_authorized]):
                     self.successful_login(username)
                     return username
-                print("validation failed")
+                else:
+                    data['error'] = DISABLED_USER_MESSAGE
             else:
-                print("Bearer not valid")
+                data['error'] = "Invalid bearer token!"
                 return
         else:
             username = self.normalize_username(data["username"])
@@ -171,12 +169,14 @@ class NaasAuthenticator(Authenticator):
                 if self.is_blocked(username):
                     return
 
-            validations = [user.is_authorized, user.is_valid_password(password)]
-
-            if all(validations):
-                self.successful_login(username)
-                return username
-
+            if all([user.is_valid_password(password)]):
+                if all([user.is_authorized]):
+                    self.successful_login(username)
+                    return username
+                else:
+                    data['error'] = DISABLED_USER_MESSAGE
+            else:
+                data['error'] = "Invalid username or password"
             self.add_login_attempt(username)
 
     def is_password_common(self, password):
