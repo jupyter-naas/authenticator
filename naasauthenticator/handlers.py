@@ -321,7 +321,7 @@ class DeleteHandler(LocalBase):
     async def get(self, slug):
         user = await self.get_current_user()
         username = None
-        if user.admin == True:
+        if user.admin is True:
             username = slug
         else:
             username = user.name
@@ -331,7 +331,6 @@ class DeleteHandler(LocalBase):
             self.finish({"data": data})
         else:
             self.redirect("/logout")
-
 
 
 class ChangePasswordHandler(LocalBase):
@@ -408,7 +407,6 @@ class ChangePasswordAdminHandler(LocalBase):
 
 
 class LoginHandler(LoginHandler, LocalBase):
-
     async def post(self):
         # parse the arguments dict
         data = {}
@@ -425,8 +423,8 @@ class LoginHandler(LoginHandler, LocalBase):
             self.redirect(self.get_next_url(user))
         else:
             error_message = "Invalid username or password"
-            if 'error' in data:
-                error_message = data['error']
+            if "error" in data:
+                error_message = data["error"]
             html = await self._render(
                 login_error=error_message, username=data["username"]
             )
@@ -458,8 +456,8 @@ class LoginHandler(LoginHandler, LocalBase):
                 self.redirect(self.get_next_url(user))
             else:
                 error_message = "Invalid bearer token!"
-                if 'error' in data:
-                    error_message = data['error']
+                if "error" in data:
+                    error_message = data["error"]
 
                 html = await self._render(login_error=error_message)
                 self.finish(html)

@@ -20,7 +20,10 @@ from .handlers import (
 )
 from .orm import UserInfo
 
-DISABLED_USER_MESSAGE = "You are not authorized anymore, please check your emails for more details."
+DISABLED_USER_MESSAGE = (
+    "You are not authorized anymore, please check your emails for more details."
+)
+
 
 class NaasAuthenticator(Authenticator):
 
@@ -82,16 +85,16 @@ class NaasAuthenticator(Authenticator):
         self.login_attempts = dict()
         if add_new_table:
             self.add_new_table()
-        
-        if os.environ.get('CREATE_DEFAULT_NAAS_USER', False) == "true":
+
+        if os.environ.get("CREATE_DEFAULT_NAAS_USER", False) == "true":
             user_info = {
                 "username": "naas",
                 "password": "naas",
                 "is_authorized": True,
                 "email": None,
-                "admin": True,  
+                "admin": True,
             }
-            user = self.create_user(**user_info)
+            self.create_user(**user_info)
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
@@ -156,19 +159,19 @@ class NaasAuthenticator(Authenticator):
                 username = data.get("username")
                 user = self.get_user(username)
                 if not user:
-                    data['error'] = "User not found!"
+                    data["error"] = "User not found!"
                     return
 
                 if all([user.is_authorized]):
                     self.successful_login(username)
                     return username
                 else:
-                    data['error'] = DISABLED_USER_MESSAGE
+                    data["error"] = DISABLED_USER_MESSAGE
             elif userAuth.status_code == 400:
-                data['error'] = DISABLED_USER_MESSAGE
+                data["error"] = DISABLED_USER_MESSAGE
                 return
             else:
-                data['error'] = "Invalid bearer token!"
+                data["error"] = "Invalid bearer token!"
                 return
         else:
             username = self.normalize_username(data["username"])
@@ -187,9 +190,9 @@ class NaasAuthenticator(Authenticator):
                     self.successful_login(username)
                     return username
                 else:
-                    data['error'] = DISABLED_USER_MESSAGE
+                    data["error"] = DISABLED_USER_MESSAGE
             else:
-                data['error'] = "Invalid username or password"
+                data["error"] = "Invalid username or password"
             self.add_login_attempt(username)
 
     def is_password_common(self, password):
