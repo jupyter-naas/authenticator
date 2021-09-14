@@ -1,3 +1,9 @@
+## 0.7.0 (2021-09-14)
+
+### Feat
+
+- **Delete/me**: Add a route to allow a user to delete his/her account
+
 ## 0.6.0 (2021-08-25)
 
 ### Feat
