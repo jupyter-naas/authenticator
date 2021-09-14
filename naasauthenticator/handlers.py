@@ -3,6 +3,7 @@ from jupyterhub.handlers.login import LoginHandler
 from jupyterhub.handlers import BaseHandler
 from tornado.httputil import url_concat
 from jupyterhub.utils import admin_only
+from urllib.parse import urlparse
 from tornado.escape import url_escape
 from types import SimpleNamespace
 from .orm import UserInfo
@@ -14,6 +15,25 @@ import os
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
+def url_path_join(*pieces):
+    """Join components of url into a relative url.
+    Use to prevent double slash when joining subpath. This will leave the
+    initial and final / in place.
+    Copied from `notebook.utils.url_path_join`.
+    """
+    initial = pieces[0].startswith('/')
+    final = pieces[-1].endswith('/')
+    stripped = [s.strip('/') for s in pieces]
+    result = '/'.join(s for s in stripped if s)
+
+    if initial:
+        result = '/' + result
+    if final:
+        result = result + '/'
+    if result == '//':
+        result = '/'
+
+    return result
 
 class LocalBase(BaseHandler):
     _template_dir_registered = False
@@ -27,6 +47,94 @@ class LocalBase(BaseHandler):
             previous_loader = env.loader
             env.loader = ChoiceLoader([previous_loader, loader])
             LocalBase._template_dir_registered = True
+    
+    def get_next_url(self, user=None, default=None):
+        """Get the next_url for login redirect
+        Default URL after login:
+        - if redirect_to_server (default): send to user's own server
+        - else: /hub/home
+        """
+        next_url = self.get_argument('next', default='')
+        # protect against some browsers' buggy handling of backslash as slash
+        next_url = next_url.replace('\\', '%5C')
+        if (next_url + '/').startswith(
+            (
+                '%s://%s/' % (self.request.protocol, self.request.host),
+                '//%s/' % self.request.host,
+            )
+        ) or (
+            self.subdomain_host
+            and urlparse(next_url).netloc
+            and ("." + urlparse(next_url).netloc).endswith(
+                "." + urlparse(self.subdomain_host).netloc
+            )
+        ):
+            # treat absolute URLs for our host as absolute paths:
+            # below, redirects that aren't strictly paths
+            parsed = urlparse(next_url)
+            next_url = parsed.path
+            if parsed.query:
+                next_url = next_url + '?' + parsed.query
+            if parsed.fragment:
+                next_url = next_url + '#' + parsed.fragment
+
+        # if it still has host info, it didn't match our above check for *this* host
+        if next_url and (
+            ('://' in next_url and next_url.index('://') < next_url.index('?'))
+            or next_url.startswith('//')
+            or not next_url.startswith('/')
+        ):
+            self.log.warning("Disallowing redirect outside JupyterHub: %r", next_url)
+            next_url = ''
+
+        if next_url and next_url.startswith(url_path_join(self.base_url, 'user/')):
+            # add /hub/ prefix, to ensure we redirect to the right user's server.
+            # The next request will be handled by SpawnHandler,
+            # ultimately redirecting to the logged-in user's server.
+            without_prefix = next_url[len(self.base_url) :]
+            next_url = url_path_join(self.hub.base_url, without_prefix)
+            self.log.warning(
+                "Redirecting %s to %s. For sharing public links, use /user-redirect/",
+                self.request.uri,
+                next_url,
+            )
+
+        # this is where we know if next_url is coming from ?next= param or we are using a default url
+        if next_url:
+            next_url_from_param = True
+        else:
+            next_url_from_param = False
+
+        if not next_url:
+            # custom default URL, usually passed because user landed on that page but was not logged in
+            if default:
+                next_url = default
+            else:
+                # As set in jupyterhub_config.py
+                if callable(self.default_url):
+                    next_url = self.default_url(self)
+                else:
+                    next_url = self.default_url
+
+        if not next_url:
+            # default URL after login
+            # if self.redirect_to_server, default login URL initiates spawn,
+            # otherwise send to Hub home page (control panel)
+            if user and self.redirect_to_server:
+                if user.spawner.active:
+                    # server is active, send to the user url
+                    next_url = user.url
+                else:
+                    # send to spawn url
+                    next_url = url_path_join(self.hub.base_url, 'spawn')
+            else:
+                next_url = url_path_join(self.hub.base_url, 'home')
+
+        if not next_url_from_param:
+            # when a request made with ?next=... assume all the params have already been encoded
+            # otherwise, preserve params from the current request across the redirect
+            next_url = self.append_query_parameters(next_url, exclude=['next'])
+        return next_url
 
 
 class SignUpHandler(LocalBase):
@@ -291,18 +399,95 @@ class ChangePasswordAdminHandler(LocalBase):
 
 
 class LoginHandler(LoginHandler, LocalBase):
+    async def post(self):
+        # parse the arguments dict
+        data = {}
+        for arg in self.request.arguments:
+            data[arg] = self.get_argument(arg, strip=False)
+
+        auth_timer = self.statsd.timer('login.authenticate').start()
+        user = await self.login_user(data)
+        auth_timer.stop(send=False)
+
+        if user:
+            # register current user for subsequent requests to user (e.g. logging the request)
+            self._jupyterhub_user = user
+            self.redirect(self.get_next_url(user))
+        else:
+            html = await self._render(
+                login_error='Invalid username or password', username=data['username']
+            )
+            self.finish(html)
+
+    async def get(self):
+        self.statsd.incr('login.request')
+        user = self.current_user
+        if user:
+            # set new login cookie
+            # because single-user cookie may have been cleared or incorrect
+            self.set_login_cookie(user)
+            self.redirect(self.get_next_url(user), permanent=False)
+        if self.get_argument('bearer', default=False):
+            bearer = self.get_argument('bearer')
+
+            auth_timer = self.statsd.timer('login.authenticate').start()
+            user = await self.login_user({
+                'bearer': bearer
+            })
+
+            auth_timer.stop(send=False)
+
+            if user:
+                # register current user for subsequent requests to user (e.g. logging the request)
+
+                #TODO: Need to set cookie for subsequent queries (allow naas manager to authenticate user as well)
+
+                self._jupyterhub_user = user
+                self.redirect(self.get_next_url(user))
+            else:
+                html = await self._render(
+                    login_error='Invalid bearer token!'
+                )
+                self.finish(html)
+                return
+        else:
+            if self.authenticator.auto_login:
+                auto_login_url = self.authenticator.login_url(self.hub.base_url)
+                if auto_login_url == self.settings['login_url']:
+                    # auto_login without a custom login handler
+                    # means that auth info is already in the request
+                    # (e.g. REMOTE_USER header)
+                    user = await self.login_user()
+                    if user is None:
+                        # auto_login failed, just 403
+                        raise web.HTTPError(403)
+                    else:
+                        self.redirect(self.get_next_url(user))
+                else:
+                    if self.get_argument('next', default=False):
+                        auto_login_url = url_concat(
+                            auto_login_url, {'next': self.get_next_url()}
+                        )
+                    self.redirect(auto_login_url)
+                return
+            username = self.get_argument('username', default='')
+            self.finish(await self._render(username=username))
+
     def _render(self, login_error=None, username=None):
         landing_url = os.getenv("LANDING_URL")
         crisp_website_id = os.getenv("CRISP_WEBSITE_ID")
+        auth_url = os.getenv('AUTH_URL', 'http://127.0.0.1:5000')
+
         return self.render_template(
             "native-login.html",
-            next=url_escape(self.get_argument("next", default="")),
+            next=url_escape(self.get_argument("next", default="/hub")),
             username=username,
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
             login_url=self.settings["login_url"],
             landing_url=landing_url,
             crisp_website_id=crisp_website_id,
+            auth_url=auth_url,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
                 {"next": self.get_argument("next", "")},

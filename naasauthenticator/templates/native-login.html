@@ -48,6 +48,16 @@
                 </p>
             </div>
             {% endif %}
+            <p style="text-align: center"> --- or --- </p>
+            <a id="github-button" href="{{auth_url}}/login/github?next={{next}}" class="btn btn-block btn-social btn-github" style='color: rgba(71, 221, 130, 1);'>
+                <i class="fa fa-github"></i> Sign in with Github
+            </a>
+            <a id="linkedin-button" href="{{auth_url}}/login/linkedin?next={{next}}" class="btn btn-block btn-social btn-linkedin" style='color: rgba(71, 221, 130, 1);'>
+                <i class="fa fa-linkedin"></i> Sign in with LinkedIn
+            </a>
+            <a id="google-button" href="{{auth_url}}/login/google?next={{next}}" class="btn btn-block btn-social btn-google" style='color: rgba(71, 221, 130, 1);'>
+                <i class="fa fa-google"></i> Sign in with Google
+            </a>
         </div>
     </form>
 </div>
