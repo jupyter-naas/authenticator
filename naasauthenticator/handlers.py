@@ -317,14 +317,21 @@ class ResetPasswordHandler(LocalBase):
 
 
 class DeleteHandler(LocalBase):
-    @admin_only
+    @web.authenticated
     async def get(self, slug):
+        user = await self.get_current_user()
+        username = None
+        if user.admin == True:
+            username = slug
+        else:
+            username = user.name
         mimetype = self.request.headers.get("content-type", None)
-        data = UserInfo.delete_user(self.db, slug)
+        data = UserInfo.delete_user(self.db, username)
         if mimetype == "application/json":
             self.finish({"data": data})
         else:
-            self.redirect("/authorize")
+            self.redirect("/logout")
+
 
 
 class ChangePasswordHandler(LocalBase):
@@ -401,6 +408,7 @@ class ChangePasswordAdminHandler(LocalBase):
 
 
 class LoginHandler(LoginHandler, LocalBase):
+
     async def post(self):
         # parse the arguments dict
         data = {}

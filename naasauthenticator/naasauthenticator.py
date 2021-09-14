@@ -82,6 +82,16 @@ class NaasAuthenticator(Authenticator):
         self.login_attempts = dict()
         if add_new_table:
             self.add_new_table()
+        
+        if os.environ.get('CREATE_DEFAULT_NAAS_USER', False) == "true":
+            user_info = {
+                "username": "naas",
+                "password": "naas",
+                "is_authorized": True,
+                "email": None,
+                "admin": True,  
+            }
+            user = self.create_user(**user_info)
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
