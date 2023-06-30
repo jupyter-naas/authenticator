@@ -8,26 +8,61 @@
 {% set announcement = announcement_login %}
 {% endif %}
 <style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    #login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 14px;
+    }
+    .icon {
+        margin-right: 4px;
+    }
+
     .custom-button .black-text {
         color: #171616;
     }
     .separator {
         position: relative;
         margin: 20px 0;
+        text-align: center;
     }
-    .separator::before {
+    .separator::before,
+    .separator::after {
         content: "";
         border-top: 1px solid #D6DEE6;
         opacity: 0.6;
-        width: 100%;
+        width: 40%; /* Adjust the width of the separator lines as needed */
         position: absolute;
         top: 50%;
     }
+    .separator::before {
+        right: calc(50% - 50%); /* Adjust the calculation to fine-tune the positioning */
+    }
+    .separator::after {
+        left: calc(50% - 50%); /* Adjust the calculation to fine-tune the positioning */
+    }
     .separator-text {
-        background: #fff;
-        padding: 0 10px;
         position: relative;
-        display: inline-block;
+        z-index: 1;
+        padding: 0 10px;
+        color: #fff;
     }
     .custom-button, .custom-input {
         border-radius: 4px;
@@ -36,34 +71,30 @@
         padding: 10px 20px;
         text-decoration: none;
         font-size: 16px;
-        margin: 0px 2px;
         color: #171616;
         font-weight: 600;
         cursor: pointer;
         transition: 0.3s;
+
+    }
+    .custom-input {
+        font-weight: normal;
+        font-size: inherit;
+    }
+    .custom-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .auth-form-body {
         border: none !important;
     }
-    .custom-input {
-        width: 100%;
+
+    .custom-link:hover,
+    .custom-link:focus {
+        color: #38B068; /* Set the desired text color */
     }
-    .custom-eye {
-        width: auto;
-        height: auto;
-        padding: 0;
-        background: none;
-        border: none;
-    }
-    .custom-login {
-        color: #fff;
-        background-color: #4cdf88;
-        border-color: #4cdf88;
-        padding: 10px 20px;
-    }
-    .custom-password {
-        margin-bottom: 5px;
-    }
+
 </style>
 <div id="login-main" class="container">
     <form action="{{login_url}}?next={{next}}" method="post" role="form">
@@ -84,13 +115,13 @@
             </p>
             {% endif %}
             <a id="google-button" href="{{auth_url}}/login/google?next={{next}}" class="btn btn-block custom-button">
-                <i class="fa fa-google black-text"></i> Continue with Google
+                <img src="{{base_url}}/static/images/custom/google.svg" alt="Google logo" class="icon"> Continue with Google
             </a>
             <a id="github-button" href="{{auth_url}}/login/github?next={{next}}" class="btn btn-block custom-button">
-                <i class="fa fa-github black-text"></i> Continue with Github
+                <img src="{{base_url}}/static/images/custom/github.svg" alt="Github logo" class="icon"> Continue with Github
             </a>
             <a id="linkedin-button" href="{{auth_url}}/login/linkedin?next={{next}}" class="btn btn-block custom-button">
-                <i class="fa fa-linkedin black-text"></i> Continue with LinkedIn
+                <img src="{{base_url}}/static/images/custom/linkedin.svg" alt="Linkedins logo" class="icon"> Continue with Linkedin
             </a>
             {% if landing_url %}
             <div style="padding-top: 25px">
@@ -109,7 +140,7 @@
                 name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
             <p></p>
             <label for='password_input'>Password</label>
-            <a style="float: right" id="forget-password" href="{{base_url}}reset-password">
+            <a style="float: right" id="forget-password" href="{{base_url}}reset-password" class="custom-link">
                 <small>Forgot Password?</small>
             </a>
             <span class="input-group custom-password">
@@ -121,6 +152,11 @@
                 </span>
             </span>
             <input type="submit" id="login_submit" class="mt-2 btn btn-block btn-primary custom-login" value="Login" tabindex="3" />
+        </div>
+        <div class="footer">
+            By continuing, you agree with Naas's <a href="https://site.naas.ai/docs/policies/terms" class="custom-link">Terms of Service</a>.
+            <br>and
+            <a href="https://site.naas.ai/docs/policies/privacy" class="custom-link">Privacy Policy</a>
         </div>
     </form>
 </div>
