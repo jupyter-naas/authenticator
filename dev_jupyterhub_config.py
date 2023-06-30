@@ -475,7 +475,7 @@ c.JupyterHub.authenticator_class = "naasauthenticator.NaasAuthenticator"
 
 ## Specify path to a logo image to override the Jupyter logo in the banner.
 #  Default: ''
-# c.JupyterHub.logo_file = ''
+c.JupyterHub.logo_file = '/srv/jupyterhub/naas_fav.svg'
 
 ## Maximum number of concurrent named servers that can be created by a user at a
 #  time.
@@ -1281,3 +1281,5 @@ c.JupyterHub.authenticator_class = "naasauthenticator.NaasAuthenticator"
 ## Maximum number of entries per page for paginated results.
 #  Default: 250
 # c.Pagination.max_per_page = 250
+
+c.JupyterHub.template_paths = ["/data/naasauthenticator/templates"]
