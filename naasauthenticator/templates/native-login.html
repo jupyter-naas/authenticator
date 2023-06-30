@@ -15,7 +15,7 @@
         padding: 10px 20px;
         text-decoration: none;
         font-size: 16px;
-        margin: 5px 2px;
+        margin: 0px 2px;
         cursor: pointer;
         transition: 0.3s;
     }
@@ -50,10 +50,10 @@
             </a>
         </div>
         <div class='auth-form-body'>
-            <p id='insecure-login-warning' class='hidden warning'>
+            <!-- <p id='insecure-login-warning' class='hidden warning'>
                 Warning: JupyterHub seems to be served over an unsecured HTTP connection.
                 We strongly recommend enabling HTTPS for JupyterHub.
-            </p>
+            </p> -->
             {% if login_error %}
             <p class="login_error">
                 {{login_error}}
@@ -75,7 +75,7 @@
                 </p>
             </div>
             {% endif %}
-            <p style="text-align: center"> --- or --- </p>  
+            <p style="text-align: center; margin-top: 15px;"> --- or --- </p>  
             <p style="text-align: center"> For legacy users </p>
 
             <label for="username_input">Username</label>
