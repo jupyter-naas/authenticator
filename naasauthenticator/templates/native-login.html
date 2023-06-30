@@ -8,6 +8,27 @@
 {% set announcement = announcement_login %}
 {% endif %}
 <style>
+    .custom-button .black-text {
+        color: #171616;
+    }
+    .separator {
+        position: relative;
+        margin: 20px 0;
+    }
+    .separator::before {
+        content: "";
+        border-top: 1px solid #D6DEE6;
+        opacity: 0.6;
+        width: 100%;
+        position: absolute;
+        top: 50%;
+    }
+    .separator-text {
+        background: #fff;
+        padding: 0 10px;
+        position: relative;
+        display: inline-block;
+    }
     .custom-button, .custom-input {
         border-radius: 4px;
         border: 1px solid #D6DEE6;
@@ -16,6 +37,8 @@
         text-decoration: none;
         font-size: 16px;
         margin: 0px 2px;
+        color: #171616;
+        font-weight: 600;
         cursor: pointer;
         transition: 0.3s;
     }
@@ -60,13 +83,13 @@
             </p>
             {% endif %}
             <a id="google-button" href="{{auth_url}}/login/google?next={{next}}" class="btn btn-block custom-button">
-                <i class="fa fa-google"></i> Continue with Google
+                <i class="fa fa-google black-text"></i> Continue with Google
             </a>
             <a id="github-button" href="{{auth_url}}/login/github?next={{next}}" class="btn btn-block custom-button">
-                <i class="fa fa-github"></i> Continue with Github
+                <i class="fa fa-github black-text"></i> Continue with Github
             </a>
             <a id="linkedin-button" href="{{auth_url}}/login/linkedin?next={{next}}" class="btn btn-block custom-button">
-                <i class="fa fa-linkedin"></i> Continue with LinkedIn
+                <i class="fa fa-linkedin black-text"></i> Continue with LinkedIn
             </a>
             {% if landing_url %}
             <div style="padding-top: 25px">
@@ -75,7 +98,9 @@
                 </p>
             </div>
             {% endif %}
-            <p style="text-align: center; margin-top: 15px;"> --- or --- </p>  
+            <div class="separator">
+                <span class="separator-text">or</span>
+            </div>
             <p style="text-align: center"> For legacy users </p>
 
             <label for="username_input">Username</label>
