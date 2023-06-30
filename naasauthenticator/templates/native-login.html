@@ -7,6 +7,41 @@
 {% if announcement_login %}
 {% set announcement = announcement_login %}
 {% endif %}
+<style>
+    .custom-button, .custom-input {
+        border-radius: 4px;
+        border: 1px solid #D6DEE6;
+        background: #F7F9FA;
+        padding: 10px 20px;
+        text-decoration: none;
+        font-size: 16px;
+        margin: 5px 2px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .auth-form-body {
+        border: none !important;
+    }
+    .custom-input {
+        width: 100%;
+    }
+    .custom-eye {
+        width: auto;
+        height: auto;
+        padding: 0;
+        background: none;
+        border: none;
+    }
+    .custom-login {
+        color: #fff;
+        background-color: #4cdf88;
+        border-color: #4cdf88;
+        padding: 10px 20px;
+    }
+    .custom-password {
+        margin-bottom: 5px;
+    }
+</style>
 <div id="login-main" class="container">
     <form action="{{login_url}}?next={{next}}" method="post" role="form">
         <div>
@@ -24,23 +59,15 @@
                 {{login_error}}
             </p>
             {% endif %}
-            <label for="username_input">Username:</label>
-            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control"
-                name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
-            <p></p>
-            <label for='password_input'>Password:</label>
-            <a style="float: right" id="forget-password" href="{{base_url}}reset-password">
-                <small>Forgot Password?</small>
+            <a id="google-button" href="{{auth_url}}/login/google?next={{next}}" class="btn btn-block custom-button">
+                <i class="fa fa-google"></i> Continue with Google
             </a>
-            <span class="input-group">
-                <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
-                <span class="input-group-addon">
-                    <button style="border:0;" type="button" id="eye">
-                        👁
-                    </button>
-                </span>
-            </span>
-            <input type="submit" id="login_submit" class="mt-2 btn btn-block btn-primary" value="Login" tabindex="3" />
+            <a id="github-button" href="{{auth_url}}/login/github?next={{next}}" class="btn btn-block custom-button">
+                <i class="fa fa-github"></i> Continue with Github
+            </a>
+            <a id="linkedin-button" href="{{auth_url}}/login/linkedin?next={{next}}" class="btn btn-block custom-button">
+                <i class="fa fa-linkedin"></i> Continue with LinkedIn
+            </a>
             {% if landing_url %}
             <div style="padding-top: 25px">
                 <p style="text-align: center;">
@@ -48,16 +75,26 @@
                 </p>
             </div>
             {% endif %}
-            <p style="text-align: center"> --- or --- </p>
-            <a id="github-button" href="{{auth_url}}/login/github?next={{next}}" class="btn btn-block btn-social btn-github" style='color: rgba(71, 221, 130, 1);'>
-                <i class="fa fa-github"></i> Sign in with Github
+            <p style="text-align: center"> --- or --- </p>  
+            <p style="text-align: center"> For legacy users </p>
+
+            <label for="username_input">Username</label>
+            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control custom-input"
+                name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
+            <p></p>
+            <label for='password_input'>Password</label>
+            <a style="float: right" id="forget-password" href="{{base_url}}reset-password">
+                <small>Forgot Password?</small>
             </a>
-            <a id="linkedin-button" href="{{auth_url}}/login/linkedin?next={{next}}" class="btn btn-block btn-social btn-linkedin" style='color: rgba(71, 221, 130, 1);'>
-                <i class="fa fa-linkedin"></i> Sign in with LinkedIn
-            </a>
-            <a id="google-button" href="{{auth_url}}/login/google?next={{next}}" class="btn btn-block btn-social btn-google" style='color: rgba(71, 221, 130, 1);'>
-                <i class="fa fa-google"></i> Sign in with Google
-            </a>
+            <span class="input-group custom-password">
+                <input type="password" class="form-control custom-input" name="password" id="password_input" tabindex="2" />
+                <span class="input-group-addon">
+                    <button style="border:0;" type="button" id="eye" class="custom-eye">
+                        👁
+                    </button>
+                </span>
+            </span>
+            <input type="submit" id="login_submit" class="mt-2 btn btn-block btn-primary custom-login" value="Login" tabindex="3" />
         </div>
     </form>
 </div>
