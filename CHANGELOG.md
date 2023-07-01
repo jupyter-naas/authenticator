@@ -1,3 +1,9 @@
+## 0.8.1 (2023-07-01)
+
+### Fix
+
+- Disabled codecov upload
+
 ## 0.8.0 (2023-07-01)
 
 ### Feat
