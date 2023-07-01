@@ -1,3 +1,10 @@
+## 0.8.3 (2023-07-01)
+
+### Fix
+
+- Disable test in ci
+- Update makefile to run tests
+
 ## 0.8.2 (2023-07-01)
 
 ### Fix
