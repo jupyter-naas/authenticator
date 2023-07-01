@@ -7,40 +7,122 @@
 {% if announcement_login %}
 {% set announcement = announcement_login %}
 {% endif %}
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    #login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 14px;
+    }
+    .icon {
+        margin-right: 4px;
+    }
+
+    .custom-button .black-text {
+        color: #171616;
+    }
+    .separator {
+        position: relative;
+        margin: 20px 0;
+        text-align: center;
+    }
+    .separator::before,
+    .separator::after {
+        content: "";
+        border-top: 1px solid #D6DEE6;
+        opacity: 0.6;
+        width: 40%; /* Adjust the width of the separator lines as needed */
+        position: absolute;
+        top: 50%;
+    }
+    .separator::before {
+        right: calc(50% - 50%); /* Adjust the calculation to fine-tune the positioning */
+    }
+    .separator::after {
+        left: calc(50% - 50%); /* Adjust the calculation to fine-tune the positioning */
+    }
+    .separator-text {
+        position: relative;
+        z-index: 1;
+        padding: 0 10px;
+        color: #fff;
+    }
+    .custom-button, .custom-input {
+        border-radius: 4px;
+        border: 1px solid #D6DEE6;
+        background: #F7F9FA;
+        padding: 10px 20px;
+        text-decoration: none;
+        font-size: 16px;
+        color: #171616;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+
+    }
+    .custom-input {
+        font-weight: normal;
+        font-size: inherit;
+    }
+    .custom-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .auth-form-body {
+        border: none !important;
+    }
+
+    .custom-link:hover,
+    .custom-link:focus {
+        color: #38B068; /* Set the desired text color */
+    }
+
+</style>
 <div id="login-main" class="container">
     <form action="{{login_url}}?next={{next}}" method="post" role="form">
         <div>
             <a href="{{base_url}}">
-                <img src='{{base_url}}logo' alt='Naas' class='naas-logo' title='Home' />
+                <!-- <img src='{{base_url}}logo' alt='Naas' class='naas-logo' title='Home' /> -->
+                <img src='{{base_url}}/static/images/custom/naas_lab.png' alt='Naas' class='naas-logo' title='Home' />
             </a>
         </div>
         <div class='auth-form-body'>
-            <p id='insecure-login-warning' class='hidden warning'>
+            <!-- <p id='insecure-login-warning' class='hidden warning'>
                 Warning: JupyterHub seems to be served over an unsecured HTTP connection.
                 We strongly recommend enabling HTTPS for JupyterHub.
-            </p>
+            </p> -->
             {% if login_error %}
             <p class="login_error">
                 {{login_error}}
             </p>
             {% endif %}
-            <label for="username_input">Username:</label>
-            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control"
-                name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
-            <p></p>
-            <label for='password_input'>Password:</label>
-            <a style="float: right" id="forget-password" href="{{base_url}}reset-password">
-                <small>Forgot Password?</small>
+            <a id="google-button" href="{{auth_url}}/login/google?next={{next}}" class="btn btn-block custom-button">
+                <img src="{{base_url}}/static/images/custom/google.svg" alt="Google logo" class="icon"> Continue with Google
             </a>
-            <span class="input-group">
-                <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
-                <span class="input-group-addon">
-                    <button style="border:0;" type="button" id="eye">
-                        👁
-                    </button>
-                </span>
-            </span>
-            <input type="submit" id="login_submit" class="mt-2 btn btn-block btn-primary" value="Login" tabindex="3" />
+            <a id="github-button" href="{{auth_url}}/login/github?next={{next}}" class="btn btn-block custom-button">
+                <img src="{{base_url}}/static/images/custom/github.svg" alt="Github logo" class="icon"> Continue with Github
+            </a>
+            <a id="linkedin-button" href="{{auth_url}}/login/linkedin?next={{next}}" class="btn btn-block custom-button">
+                <img src="{{base_url}}/static/images/custom/linkedin.svg" alt="Linkedins logo" class="icon"> Continue with Linkedin
+            </a>
             {% if landing_url %}
             <div style="padding-top: 25px">
                 <p style="text-align: center;">
@@ -48,16 +130,33 @@
                 </p>
             </div>
             {% endif %}
-            <p style="text-align: center"> --- or --- </p>
-            <a id="github-button" href="{{auth_url}}/login/github?next={{next}}" class="btn btn-block btn-social btn-github" style='color: rgba(71, 221, 130, 1);'>
-                <i class="fa fa-github"></i> Sign in with Github
+            <div class="separator">
+                <span class="separator-text">or</span>
+            </div>
+            <p style="text-align: center"> For legacy users </p>
+
+            <label for="username_input">Username</label>
+            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control custom-input"
+                name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
+            <p></p>
+            <label for='password_input'>Password</label>
+            <a style="float: right" id="forget-password" href="{{base_url}}reset-password" class="custom-link">
+                <small>Forgot Password?</small>
             </a>
-            <a id="linkedin-button" href="{{auth_url}}/login/linkedin?next={{next}}" class="btn btn-block btn-social btn-linkedin" style='color: rgba(71, 221, 130, 1);'>
-                <i class="fa fa-linkedin"></i> Sign in with LinkedIn
-            </a>
-            <a id="google-button" href="{{auth_url}}/login/google?next={{next}}" class="btn btn-block btn-social btn-google" style='color: rgba(71, 221, 130, 1);'>
-                <i class="fa fa-google"></i> Sign in with Google
-            </a>
+            <span class="input-group custom-password">
+                <input type="password" class="form-control custom-input" name="password" id="password_input" tabindex="2" />
+                <span class="input-group-addon">
+                    <button style="border:0;" type="button" id="eye" class="custom-eye">
+                        👁
+                    </button>
+                </span>
+            </span>
+            <input type="submit" id="login_submit" class="mt-2 btn btn-block btn-primary custom-login" value="Login" tabindex="3" />
+        </div>
+        <div class="footer">
+            By continuing, you agree with Naas's <a href="https://site.naas.ai/docs/policies/terms" class="custom-link">Terms of Service</a>.
+            <br>and
+            <a href="https://site.naas.ai/docs/policies/privacy" class="custom-link">Privacy Policy</a>
         </div>
     </form>
 </div>
