@@ -186,7 +186,7 @@ async def test_list_users(tmpcwd, app):
 
     res = auth.get_users()
     users = [item.as_dict() for item in res]
-    assert len(users) == 2
+    assert len(users) == 3
     user = dict(users[0])
     assert type(user) == dict
 
