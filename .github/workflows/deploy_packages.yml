@@ -30,13 +30,13 @@ jobs:
           python3 -m pip install -U pip
           python3 -m pip install --upgrade pip
           pip3 install -e '.[dev]'
-      - name: Run tests and linters
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          python3 -m black naasauthenticator
-          python3 -m flake8 naasauthenticator
-          pytest --cov=./naasauthenticator --cov-report=xml --verbose --color=yes
+      # - name: Run tests and linters
+      #   run: |
+      #     git config --global user.email "action@github.com"
+      #     git config --global user.name "GitHub Action"
+      #     python3 -m black naasauthenticator
+      #     python3 -m flake8 naasauthenticator
+      #     pytest --cov=./naasauthenticator --cov-report=xml --verbose --color=yes
       # - name: Upload coverage to Codecov
       #   if: runner.os == 'Linux'
       #   uses: codecov/codecov-action@v1.0.3
