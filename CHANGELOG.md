@@ -1,3 +1,19 @@
+## 0.8.0 (2023-07-01)
+
+### Feat
+
+- polished the feature
+- add black text for button
+- first push to update design
+
+### Fix
+
+- Bump commitizen version
+- Change how static images are loaded
+- login page
+- Working on local dev exeperience
+- Pin hub version
+
 ## 0.7.2 (2021-11-24)
 
 ### Fix
